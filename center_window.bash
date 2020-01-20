@@ -64,8 +64,11 @@ function row_of_monitors {
     monitors=`xrandr --query | grep " connected "`
     while read monitor ; do
         readarray -td ' ' monitor_words <<<"$monitor"
-        # Array index 3 holds the geometry of the monitor, in WIDTHxHEIGHT+X+Y format.
-        geometry_word=${monitor_words[3]}
+        # Array index 2 or 3 holds the geometry of the monitor, in WIDTHxHEIGHT+X+Y format.
+        geometry_word=${monitor_words[2]}
+        if [[ "$geometry_word" == "primary" ]] ; then
+            geometry_word=${monitor_words[3]}
+        fi
         geometry_word=`echo $geometry_word | sed 's,+,x,g'`
         readarray -td 'x' geometry <<<"$geometry_word"
         monitor_widths+=(${geometry[0]})
@@ -115,7 +118,7 @@ function row_of_monitors {
 
             # Apply new window geometry and position.
             xdotool windowsize ${window} ${window_width} 100%
-            xdotool windowmove ${window} ${x} 0
+            xdotool windowmove ${window} $((${left} + ${x})) 0
 
             break
         fi
