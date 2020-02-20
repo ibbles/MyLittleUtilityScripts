@@ -92,25 +92,33 @@ function row_of_monitors {
             screen_width=${monitor_widths[i]}
             half_screen_width=$((${screen_width} / 2))
 
-            # Wanted window size.
-            narrow_window_width=$((half_screen_width * 20 / 20))
-            wide_window_width=$((half_screen_width * 20 / 15))
-
-            # Left edge position of the window to center with the wanted window sizes.
-            narrow_x=$((${half_screen_width} - ${narrow_window_width} / 2))
-            wide_x=$((${half_screen_width} - ${wide_window_width} / 2))
-
-            # Pick the wide width if we're close to the narrow width.
-            eval $(xwininfo -id $window | sed -n -e 's/^ \+Width: \([0-9].*\)/old_window_width=\1/p')
-            diff=$(($narrow_window_width - $old_window_width))
-            diff=${diff//-/} # Remove -, if it's there.
-            if [ "$diff" -lt "10" ] ; then # A bit of wiggle-room to account for (work around) border width.
-                window_width=${wide_window_width}
-                x=${wide_x}
-            else
-                window_width=${narrow_window_width}
-                x=${narrow_x}
-            fi
+            width_constants=(13 15 20 25)
+            for index in ${!width_constants[@]} ; do
+                # Compute target size and position for this width constant.
+                # If no match with the current window size is found, then
+                # these are the values that will be used, from the last
+                # iteration.
+                width_constant=${width_constants[${index}]}
+                window_width=$((${half_screen_width} * 20 / ${width_constant}))
+                x=$((${half_screen_width} - ${window_width} / 2))
+                # Compare with current window size.
+                eval $(xwininfo -id $window | sed -n -e 's/^ \+Width: \([0-9].*\)/old_window_width=\1/p')
+                diff=$(($window_width - $old_window_width))
+                diff=${diff//-/} # Remove -, if it's there.
+                if [ "${diff}" -lt "10" ] ; then
+                    # They are close, so we want to switch to the next size.
+                    index=$((index + 1))
+                    if [ "${index}" -eq "${#width_constants[@]}" ] ; then
+                        # We were at the last size, wrap back to the first.
+                        index=0
+                    fi
+                    # Compute new target size.
+                    width_constant=${width_constants[${index}]}
+                    window_width=$(($half_screen_width * 20 / ${width_constant}))
+                    x=$((${half_screen_width} - ${window_width} / 2))
+                    break
+                fi
+            done
 
             # Can only resize windows that aren't maximized.
             wmctrl -r :ACTIVE: -b remove,maximized_vert
