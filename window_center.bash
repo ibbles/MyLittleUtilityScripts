@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# This script places the current window in the center of the screen. Switches
-# between two different sizes if already centered. The intention is to bind a
+# This script places the current window in the center of the monitor. Switches
+# between different sizes if already centered. The intention is to bind a
 # keyboard shortcut to run it.
 #
 # Two versions are included, one that has only been tested on single-monitor
