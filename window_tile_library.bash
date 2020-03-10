@@ -54,17 +54,20 @@ function gather_monitors {
     monitor_ids=${!monitor_widths[@]}
 }
 
-# Find the center position of the current window.
-function get_current_center {
+# Find the current position, both left and center, of the current window.
+#
+# out: int window_left_position
+# out: int window_center_position
+function get_current_window_position {
     window=`xdotool getactivewindow`
-    window_position=`xdotool getwindowgeometry ${window} | grep "Position:" | tr -s ' ' | cut -d ' ' -f3 | cut -d ',' -f1`
+    window_left_position=`xdotool getwindowgeometry ${window} | grep "Position:" | tr -s ' ' | cut -d ' ' -f3 | cut -d ',' -f1`
     window_width=`xdotool getwindowgeometry ${window} | grep "Geometry:" | tr -s ' ' | cut -d ' ' -f3 | cut -d 'x' -f1`
-    window_center=$(($window_position + ($window_width / 2)))
+    window_center_position=$(($window_left_position + ($window_width / 2)))
 }
 
 # Find the monitor that contains the given X position. Will set all outputs to -1 on error.
 #
-# in: int window_center - The X position to find the monitor for.
+# in: int window_center_position - The X position to find the monitor for.
 # in: array<int> monitor_widths - The width of each monitor.
 # in: array<int> monitor_position - The X position of each monitor.
 # in: array<index> monitor_ids - List of indices into the other monitor_ arrays.
@@ -81,14 +84,21 @@ function get_current_monitor {
     for i in ${monitor_ids} ; do
         left=${monitor_positions[i]}
         right=$((${left} + ${monitor_widths[i]}))
-        if [[ ${window_center} -ge  $left && ${window_center} -lt $right ]] ; then
+        # echo "Checking window position ${window_center_position} against monitor range ${left}:${right}."
+        if [[ ${window_center_position} -ge  $left && ${window_center_position} -lt $right ]] ; then
             monitor_id=${i}
             monitor_width=${monitor_widths[${i}]}
             monitor_height=${monitor_heights[${i}]}
             monitor_position=${monitor_positions[${i}]}
+            # echo "The window is on monitor starting at X position ${monitor_position}."
             return
         fi
     done
+    monitor_id=${monitor_ids[0]}
+    monitor_width=${monitors_widths[0]}
+    monitor_height=${monitor_heights[0]}
+    monitor_position=${monitor_positions[0]}
+    # echo "The window is not on any monitor. Falling back to monitor 0 at position ${monitor_position}."
 }
 
 
@@ -106,14 +116,13 @@ function get_current_window_width {
 # in: int current_window_width
 #
 # out: int target_window_width
-function get_next_window_width {
+function get_target_window_width {
     percentages=(20 30 50 70 80)
     for i in ${!percentages[@]} ; do
         percentage=${percentages[i]}
         width=$((${monitor_width} * ${percentage} / 100))
         diff=$((${width} - ${current_window_width}))
         diff=${diff//-} # Remove -, if it's there.
-        echo "current is ${current_window_width}, Testing ${width}, Diff ${diff}"
         if [ ${diff} -lt 10 ] ; then
             # Found a match. Return the next size.
             i=$((${i} + 1))
@@ -122,14 +131,14 @@ function get_next_window_width {
             fi
             percentage=${percentages[i]}
             target_window_width=$((${monitor_width} * ${percentage} / 100))
-            echo "match: target_window_width=${target_window_width}"
+            # echo "Next target_window_width is ${target_window_width}."
             return
         fi
     done
     # No match, pick the first in the list.
     percentage=${percentages[0]}
     target_window_width=$((${monitor_width} * ${percentage} / 100))
-    echo "Fallback: target_window_width=${target_window_width}"
+    # echo "Fallback target_window_width is ${target_window_width}."
 }
 
 # Get the position the window should have given the target width and side.
@@ -141,9 +150,9 @@ function get_next_window_width {
 #
 # out: int target_window_position - The target position of the left edge of the window.
 
-function get_window_position {
-    echo "Computing target_window_position = ${monitor_position} + ${side} * (${monitor_width} - ${target_window_width})"
+function get_target_window_position {
     target_window_position=$((${monitor_position} + ${side} * (${monitor_width} - ${target_window_width})))
+    # echo "Computing target_window_position: ${target_window_position} = ${monitor_position} + ${side} * (${monitor_width} - ${target_window_width})"
 }
 
 function position_window {
@@ -151,8 +160,12 @@ function position_window {
     wmctrl -r :ACTIVE: -b remove,maximized_vert
     wmctrl -r :ACTIVE: -b remove,maximized_horz
 
-    # Apply new window and position.
-    xdotool windowmove ${window} ${target_window_position} 0
+
+    # Apply new window geometry. We must resize before move because when
+    # switching from right-large to right-small the big windows cannot be moved
+    # enough far right when on GNOME Shell. Resize first so it fits on the
+    # monitor.
+    xdotool windowsize ${window} ${target_window_width} ${monitor_height}
 
     # Wait for the animation to finish, otherwise the next step will clobber it.
     # TODO: Find a way to force instantaneous resize/reposition.
@@ -163,8 +176,8 @@ function position_window {
         sleep ${sleep_time}
     fi
 
-    # Apply new window geometry.
-    xdotool windowsize ${window} ${target_window_width} ${monitor_height}
+    # Apply new window position.
+    xdotool windowmove ${window} ${target_window_position} 0
 
     # Another wait.
     if [ -n "${sleep_time}" ] ; then
@@ -176,6 +189,12 @@ function position_window {
     # a vertical maximation as well. This will likely handle panels and such
     # better anyway.
     wmctrl -r :ACTIVE: -b add,maximized_vert
+
+    ## These prints are for debugging only.
+    # sleep 1
+    # get_current_window_position
+    # echo "Placing window at ${target_window_position} and resizing to ${target_window_width}."
+    # echo "Relocated window ended up at ${window_left_position} with size ${window_width}."
 }
 
 # The the current window on either the right or the left side.
@@ -184,10 +203,10 @@ function position_window {
 function tile_window {
     side=$1
     gather_monitors
-    get_current_center
+    get_current_window_position
     get_current_monitor
     get_current_window_width
-    get_next_window_width
-    get_window_position
+    get_target_window_width
+    get_target_window_position
     position_window
 }
