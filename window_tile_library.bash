@@ -1,3 +1,23 @@
+
+
+# Some window managers do window animations and chaining several window
+# operations in quick succession fails on some of those window managers if a new
+# operation is started while the previous one is still running. I don't know how
+# to trigger multiple operations at once, or even how to determine the necessary
+# wait time between operations, so here I set a high default wait time and
+# provide a list of fast window managers that doesn't need the wait.
+## TODO Figure out how to perform resize/reposition as a single operation.
+## TODO Alternative, figure out how to disable the animation for a particular operation.
+window_manager=`wmctrl -m | awk '/Name: / {print $2}'`
+fast_window_managers=("Xfwm4")
+sleep_time=0.5
+for fast_wm in ${fast_window_managers[@]} ; do
+    if [[ ${window_manager} = ${fast_wm} ]] ; then
+        sleep_time=0
+    fi
+done
+
+
 # Find the width and X position of each monitor.
 #
 # out: array<int> monitor_widths - The width of each monitor.
@@ -133,13 +153,17 @@ function position_window {
     # TODO: Alternative, find a way to make the resize produce a window filling
     # the whole height of the monitor. One would think that passing ${monitor_height}
     # for the height of the window would do that, but apparently not.
-    sleep 0.5
+    if [[ ${sleep_time} -gt 0 ]] ; then
+        sleep ${sleep_time}
+    fi
 
     # Apply new window geometry.
     xdotool windowsize ${window} ${target_window_width} ${monitor_height}
 
     # Another wait.
-    sleep 0.5
+    if [[ ${sleep_time} -gt 0 ]] ; then
+        sleep ${sleept_time}
+    fi
 
     # Something somewhere is buggy and causes the final window height to be
     # something other than what is being passed to `xdotool windowsize`. Doing
