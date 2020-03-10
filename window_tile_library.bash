@@ -9,14 +9,20 @@
 ## TODO Figure out how to perform resize/reposition as a single operation.
 ## TODO Alternative, figure out how to disable the animation for a particular operation.
 window_manager=`wmctrl -m | awk '/Name: / {print $2}'`
-fast_window_managers=("Xfwm4")
+
+# Xfwm4 seems to be fast by default.
+# GNOME Shell is fast if Animations has been disabled in GNOME Tweaks -> General.
+fast_window_managers=("Xfwm4", "GNOME Shell")
 sleep_time=0.5
 for fast_wm in ${fast_window_managers[@]} ; do
     if [[ ${window_manager} = ${fast_wm} ]] ; then
-        sleep_time=0
+        # It's not clear what consitutes "fast", but some sleep seems to be
+        # important on GNOME Shell even with animations disabled. Otherwise the
+        # final window size and position doesn't become what we request.
+        sleep_time=0.1
+        break
     fi
 done
-
 
 # Find the width and X position of each monitor.
 #
@@ -153,7 +159,7 @@ function position_window {
     # TODO: Alternative, find a way to make the resize produce a window filling
     # the whole height of the monitor. One would think that passing ${monitor_height}
     # for the height of the window would do that, but apparently not.
-    if [[ ${sleep_time} -gt 0 ]] ; then
+    if [ -n "${sleep_time}" ] ; then
         sleep ${sleep_time}
     fi
 
@@ -161,8 +167,8 @@ function position_window {
     xdotool windowsize ${window} ${target_window_width} ${monitor_height}
 
     # Another wait.
-    if [[ ${sleep_time} -gt 0 ]] ; then
-        sleep ${sleept_time}
+    if [ -n "${sleep_time}" ] ; then
+        sleep ${sleep_time}
     fi
 
     # Something somewhere is buggy and causes the final window height to be
