@@ -1,4 +1,9 @@
 
+function do_log {
+    echo "$@" >> /tmp/window_tile_library.log
+}
+echo "" > /tmp/window_tile_library.log
+do_log "\n"
 
 # Some window managers do window animations and chaining several window
 # operations in quick succession fails on some of those window managers if a new
@@ -14,7 +19,8 @@ window_manager=`wmctrl -m | awk '/Name: / {print $2}'`
 # Xfwm4 seems to be fast by default.
 # GNOME Shell is fast if Animations has been disabled in GNOME Tweaks -> General.
 fast_window_managers=("Xfwm4", "GNOME Shell")
-sleep_time=0.5
+slow_window_managers=("GNOME Shell")
+sleep_time=1.0  # Window managers that are neither fast nor slow are assumed to be really slow.
 for fast_wm in ${fast_window_managers[@]} ; do
     if [[ ${window_manager} = ${fast_wm} ]] ; then
         # It's not clear what consitutes "fast", but some sleep seems to be
@@ -24,6 +30,13 @@ for fast_wm in ${fast_window_managers[@]} ; do
         break
     fi
 done
+for slow_wm in ${slow_window_managers[@]} ; do
+    if [[ ${window_manager} = ${slow_wm} ]] ; then
+        sleep_time=0.5
+        break;
+    fi
+done
+
 
 # Find the width and X position of each monitor.
 #
@@ -85,13 +98,13 @@ function get_current_monitor {
     for i in ${monitor_ids} ; do
         left=${monitor_positions[i]}
         right=$((${left} + ${monitor_widths[i]}))
-        # echo "Checking window position ${window_center_position} against monitor range ${left}:${right}."
+        do_log "Checking window position ${window_center_position} against monitor range ${left}:${right}."
         if [[ ${window_center_position} -ge  $left && ${window_center_position} -lt $right ]] ; then
             monitor_id=${i}
             monitor_width=${monitor_widths[${i}]}
             monitor_height=${monitor_heights[${i}]}
             monitor_position=${monitor_positions[${i}]}
-            # echo "The window is on monitor starting at X position ${monitor_position}."
+            do_log "The window is on monitor starting at X position ${monitor_position}."
             return
         fi
     done
@@ -99,7 +112,7 @@ function get_current_monitor {
     monitor_width=${monitors_widths[0]}
     monitor_height=${monitor_heights[0]}
     monitor_position=${monitor_positions[0]}
-    # echo "The window is not on any monitor. Falling back to monitor 0 at position ${monitor_position}."
+    do_log "The window is not on any monitor. Falling back to monitor 0 at position ${monitor_position}."
 }
 
 
@@ -132,14 +145,14 @@ function get_target_window_width {
             fi
             percentage=${percentages[i]}
             target_window_width=$((${monitor_width} * ${percentage} / 100))
-            # echo "Next target_window_width is ${target_window_width}."
+            do_log "Next target_window_width is ${target_window_width}."
             return
         fi
     done
     # No match, pick the first in the list.
     percentage=${percentages[0]}
     target_window_width=$((${monitor_width} * ${percentage} / 100))
-    # echo "Fallback target_window_width is ${target_window_width}."
+    do_log "Fallback target_window_width is ${target_window_width}."
 }
 
 # Get the position the window should have given the target width and side.
@@ -153,7 +166,7 @@ function get_target_window_width {
 
 function get_target_window_position {
     target_window_position=$((${monitor_position} + ${side} * (${monitor_width} - ${target_window_width})))
-    # echo "Computing target_window_position: ${target_window_position} = ${monitor_position} + ${side} * (${monitor_width} - ${target_window_width})"
+    do_log "Computing target_window_position: ${target_window_position} = ${monitor_position} + ${side} * (${monitor_width} - ${target_window_width})"
 }
 
 function position_window {
@@ -167,6 +180,7 @@ function position_window {
     # enough far right when on GNOME Shell. Resize first so it fits on the
     # monitor.
     xdotool windowsize ${window} ${target_window_width} ${monitor_height}
+    do_log "Resizing window to ${target_window_width}."
 
     # Wait for the animation to finish, otherwise the next step will clobber it.
     # TODO: Find a way to force instantaneous resize/reposition.
@@ -174,14 +188,17 @@ function position_window {
     # the whole height of the monitor. One would think that passing ${monitor_height}
     # for the height of the window would do that, but apparently not.
     if [ -n "${sleep_time}" ] ; then
+        do_log "Sleeping for ${sleep_time}."
         sleep ${sleep_time}
     fi
 
     # Apply new window position.
     xdotool windowmove ${window} ${target_window_position} 0
+    do_log "Moving window to ${target_window_position}."
 
     # Another wait.
     if [ -n "${sleep_time}" ] ; then
+        do_log "Sleeping for ${sleep_time}."
         sleep ${sleep_time}
     fi
 
@@ -190,12 +207,6 @@ function position_window {
     # a vertical maximation as well. This will likely handle panels and such
     # better anyway.
     wmctrl -r :ACTIVE: -b add,maximized_vert
-
-    ## These prints are for debugging only.
-    # sleep 1
-    # get_current_window_position
-    # echo "Placing window at ${target_window_position} and resizing to ${target_window_width}."
-    # echo "Relocated window ended up at ${window_left_position} with size ${window_width}."
 }
 
 # The the current window on either the right or the left side.
@@ -210,4 +221,20 @@ function tile_window {
     get_target_window_width
     get_target_window_position
     position_window
+
+    # Check if we ended up where we wanted.
+    get_current_window_position
+    diff=$((${window_left_position} - ${target_window_position}))
+    diff=${diff//-}
+    if [ ${diff} -gt 10 ] ; then
+        do_log "Placing window at ${target_window_position} and resizing to ${target_window_width}."
+        do_log "Relocated window ended up at ${window_left_position} with size ${window_width}."
+        do_log "Distance is ${diff}."
+        do_log "Too far away, trying again."
+        sleep 0.5
+        position_window
+    fi
+    do_log "Placing window at ${target_window_position} and resizing to ${target_window_width}."
+    do_log "Relocated window ended up at ${window_left_position} with size ${window_width}."
+
 }
