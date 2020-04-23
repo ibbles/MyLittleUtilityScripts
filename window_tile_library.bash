@@ -8,6 +8,7 @@
 # provide a list of fast window managers that doesn't need the wait.
 ## TODO Figure out how to perform resize/reposition as a single operation.
 ## TODO Alternative, figure out how to disable the animation for a particular operation.
+## TODO Alternative, figure out how to block until the animation is complete.
 window_manager=`wmctrl -m | awk '/Name: / {print $2}'`
 
 # Xfwm4 seems to be fast by default.
