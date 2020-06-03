@@ -79,7 +79,7 @@ function getMousePoint
 
 
 echo "Reading options."
-while getopts "p:s:wh" opt; do
+while getopts "p:s:wih" opt; do
   case $opt in
     p)
       parsePoint "$OPTARG"
@@ -95,6 +95,11 @@ while getopts "p:s:wh" opt; do
       ;;
     w)
         getCurrentWindowPositionAndSize
+        ;;
+    i)
+        getCurrentWindowPositionAndSize
+        echo "Window is ${sizeX}x${sizeY}."
+        exit 0
         ;;
     h)
         echo "Usage: TODO"
