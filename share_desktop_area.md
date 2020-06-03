@@ -38,3 +38,59 @@ We can also pipe into ffplay:
 This has a little lower latency, but I guess that has more to do with the the preset/tune parameters than vlc/ffplay.
 
 This is usable.
+
+
+
+There is also a Python script on StackOverflow by Mark Setchell that pipes ffmpeg to a OpenCV window.
+See https://stackoverflow.com/questions/60264704/i-want-to-display-mouse-pointer-in-my-recording
+
+It's written for OSX but I got the FFMPEG command to run on my machine. Something like.
+
+`ffmpeg -f x11grab -r 20 -s 1920x1080 -i :0.0+0,0 -vf -f rawvideo pipe:1`
+
+Maybe this can be piped to VLC.
+
+
+`ffmpeg -f x11grab -r 20 -s 1920x1080 -i :0.0+0,0 -vf scale=w=1920:h=1080 -f rawvideo pipe:1 | vlc -`
+
+Does not work. ffmpeg seems to be doing its thing, but VLC never displays a picture. Maybe it doesn't support `rawvideo`?
+Replacing with matroskal
+
+
+`ffmpeg -f x11grab -r 20 -s 1920x1080 -i :0.0+0,0 -vf scale=w=1920:h=1080 -f matroska pipe:1 | vlc -`
+
+```
+mkv demux error: cannot find any cluster or chapter, damaged file ?
+```
+
+Perhaps the `pipe:1` doesn't work. Previous commands have used `-` instead. Trying.
+
+`ffmpeg -f x11grab -r 20 -s 1920x1080 -i :0.0+0,0 -vf scale=w=1920:h=1080 -f matroska - | vlc -`
+
+Still getting `mkv demux error: cannot find any cluster or chapter, damaged file ?`
+
+Why is it different when running on the command line compared to from the Python script?
+
+Is it VLC's fault? Should I use ffplay instead?
+
+`ffmpeg -f x11grab -r 20 -s 1920x1080 -i :0.0+0,0 -vf scale=w=1920:h=1080 -f matroska - | ffplay -`
+
+Got an image, but performance is very bad. Several seconds of latency.
+
+Testing with rawvideo instead of matroska.
+
+
+`ffmpeg -f x11grab -r 20 -s 1920x1080 -i :0.0+0,0 -vf scale=w=1920:h=1080 -f rawvideo - | ffplay -`
+
+That didn't work at all: `pipe:: Invalid data found when processing input`.
+
+
+It seems just running the Python script is by far the best approach. Its full ffmpeg command line is
+
+
+`ffmpeg -f x11grab -r 20 -s 1920x1080 -i :0.0+0,0 -vf scale=w=1920:h=1080 -f rawvideo pipe:1`
+
+I consider this to be equivalent to my experiments.
+
+
+`ffmpeg -f x11grab -r 20 -s 1920x1080 -i :0.0+0,0 -vf scale=w=1920:h=1080 -f matroska - | ffplay -`
