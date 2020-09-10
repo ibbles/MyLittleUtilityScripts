@@ -54,7 +54,7 @@ Maybe this can be piped to VLC.
 `ffmpeg -f x11grab -r 20 -s 1920x1080 -i :0.0+0,0 -vf scale=w=1920:h=1080 -f rawvideo pipe:1 | vlc -`
 
 Does not work. ffmpeg seems to be doing its thing, but VLC never displays a picture. Maybe it doesn't support `rawvideo`?
-Replacing with matroskal
+Replacing with matroska:
 
 
 `ffmpeg -f x11grab -r 20 -s 1920x1080 -i :0.0+0,0 -vf scale=w=1920:h=1080 -f matroska pipe:1 | vlc -`
