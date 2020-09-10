@@ -18,6 +18,7 @@ if  test $num_args -ne 1
     print_usage
 end
 
+
 function show_info
     echo "Project path: $project_path"
     echo "project name: $project_name"
@@ -25,9 +26,11 @@ function show_info
     echo "Unreal Engine: $ue_root"
 end
 
+
 function generate_project
     eval "$ue_generate" "$project_path" -CMakefile -QMakefile -Makefile -game
 end
+
 
 function build_project
     make "$target_name"
