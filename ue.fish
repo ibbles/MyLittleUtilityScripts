@@ -8,7 +8,7 @@
 # Takes one argument, which should be either 'info', 'generate', 'build' or 'open'.
 
 function print_usage
-    echo "Usage: $argv[0] info|generate|build|open"
+    echo "Usage: ue.fish info|generate|build|open"
     exit 1
 end
 
