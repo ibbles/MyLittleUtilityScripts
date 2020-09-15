@@ -42,11 +42,17 @@ function open_project
 end
 
 
+if not test -f CMakeLists.txt
+   echo "The current directory doesn't have a CMakeLists.txt. The project files must be generated before using this script."
+   exit 1
+end
+
+
 set ue_root (grep add_custom_target CMakeLists.txt | head -n1 | cut -d '"' -f2)
 set ue_binary $ue_root/Engine/Binaries/Linux/UE4Editor
 set ue_generate $ue_root/GenerateProjectFiles.sh
 if not type -q "$ue_binary"
-    echo "Unreal Engine Editor binary $ue_binary is not executable."
+    echo "Unreal Engine Editor binary '$ue_binary' is not executable."
     exit 1
 end
 if not type -q "$ue_generate"
