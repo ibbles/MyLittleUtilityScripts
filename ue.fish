@@ -28,7 +28,7 @@ end
 
 
 function generate_project
-    eval "$ue_generate" "$project_path" -CMakefile -QMakefile -Makefile -game
+    eval "$ue_generate" "$project_path" -CMakefile -Makefile -game
 end
 
 
