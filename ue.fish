@@ -28,42 +28,66 @@ end
 
 
 function generate_project
-    eval "$ue_generate" "$project_path" -CMakefile -QMakefile -Makefile -game
+    check_ue_generate
+    eval "$ue_generate" "$project_path" -CMakefile -Makefile -game
 end
 
 
 function build_project
+    check_makefile
     make "$target_name"
 end
 
 
 function open_project
+    check_ue_binary
     eval "$ue_binary" "$project_path" -nosound
 end
 
 
-if not test -f CMakeLists.txt
-   echo "The current directory doesn't have a CMakeLists.txt. The project files must be generated before using this script."
-   exit 1
+function check_ue_binary
+    if not type -q "$ue_binary"
+        echo "Unreal Engine Editor binary '$ue_binary' is not executable."
+        exit 1
+    end
 end
 
 
-set ue_root (grep add_custom_target CMakeLists.txt | head -n1 | cut -d '"' -f2)
-set ue_binary $ue_root/Engine/Binaries/Linux/UE4Editor
-set ue_generate $ue_root/GenerateProjectFiles.sh
-if not type -q "$ue_binary"
-    echo "Unreal Engine Editor binary '$ue_binary' is not executable."
+function check_ue_generate
+    if not type -q "$ue_generate"
+        echo "Unreal Engine project generator script $ue_generate is not executable."
+        exit 1
+    end
+end
+
+function check_makefile
+    if not test -f Makefile
+        echo "The current directory doesn't have a Makefile. The project files must be generated before it can be built."
+        exit 1
+    end
+end
+
+
+if test -f CMakeLists
+    set ue_root (grep add_custom_target CMakeLists.txt | head -n1 | cut -d '"' -f2)
+else if test -n "$UE_ROOT"
+    set ue_root "$UE_ROOT"
+else
+    echo "Have neither a CMakeLists.txt nor UE_ROOT environment variable. Don't know where Unreal Engine is."
     exit 1
 end
-if not type -q "$ue_generate"
-   echo "Unreal Engine project generator script $ue_generate is not executable."
-   exit 1
-end
 
 
-# TODO: Only aloow a single .uproject file.
+set ue_binary $ue_root/Engine/Binaries/Linux/UE4Editor
+set ue_generate $ue_root/GenerateProjectFiles.sh
+
 
 set project_path (readlink -f *.uproject)
+if not test -f "$project_path"
+    echo "No .uproject file found, the project path '"(readlink -f .)"' is not a valid Unreal Engine project."
+    exit 1
+end
+
 set project_name (basename "$project_path" .uproject)
 set target_name $project_name"Editor"
 
