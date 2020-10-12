@@ -68,7 +68,7 @@ function check_makefile
 end
 
 
-if test -f CMakeLists
+if test -f "CMakeLists.txt"
     set ue_root (grep add_custom_target CMakeLists.txt | head -n1 | cut -d '"' -f2)
 else if test -n "$UE_ROOT"
     set ue_root "$UE_ROOT"
