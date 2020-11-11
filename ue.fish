@@ -5,7 +5,7 @@
 # project files since the path to the Unreal Engine binary is read from
 # CMakeLists.txt. It always builds the .+Editor build target.
 #
-# Takes one argument, which should be either 'info', 'generate', 'build' or 'open'.
+# Takes one argument, which should be either 'info', 'generate', 'build', 'open' or 'play'.
 
 function print_usage
     echo "Usage: ue.fish info|generate|build|open"
@@ -44,6 +44,11 @@ function open_project
     eval "$ue_binary" "$project_path" -nosound
 end
 
+
+function play_project
+    check_ue_binary
+    eval "$ue_binary" "$project_path" -Game -NoSound -Windowed ResX=1920 ResY=1080
+end
 
 function check_ue_binary
     if not type -q "$ue_binary"
@@ -100,6 +105,8 @@ switch $argv[1]
          build_project
     case open
          open_project
+    case play
+         play_project
     case '*'
          print_usage
 end
