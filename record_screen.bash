@@ -102,7 +102,10 @@ while getopts "p:s:wih" opt; do
         exit 0
         ;;
     h)
-        echo "Usage: TODO"
+        echo "Usage: $0 [-p XPOSxYPOS] [-s WIDTHxHEIGHT] [-w]"
+        echo "  -p  The screen position of the top-left corner of the record area."
+        echo "  -s  The size of the record area."
+        echo "  -w  Set size and position from the current window, after a short delay."
         exit 0
         ;;
     ?)
