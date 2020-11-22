@@ -170,6 +170,8 @@ pauseWithMessage "Video capture starting in..."
 #ffmpeg -f x11grab -r 30 -s ${sizeX}x${sizeY} -i :0.0+${posX},${posY} -acodec pcm_s16le -vcodec libx264 -preset medium -threads 0 -vf format=yuv420p "${output}"
 
 # This one is supposed to work on iPads. 'format=' has been changed to 'pix_fmt'
+# It does not record audio. Look into "-f pulse -ac 2 -i default" for this.
+# See https://trac.ffmpeg.org/wiki/Capture/Desktop
 ffmpeg -f x11grab -show_region 1 -r 30 -s ${sizeX}x${sizeY} -i :0.0+${posX},${posY} -acodec pcm_s16le -vcodec libx264 -preset medium -threads 0 -pix_fmt yuv420p "${output}"
 
 
