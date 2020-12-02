@@ -17,6 +17,8 @@
 # Output format:
 #   INDEX NAME MODULE SAMPLE_TYPE CHANNELS FREQ STATE
 # STATE is RUNNING for the currently selected device.
+# TODO: No it's not. It's RUNNING for devices playing audio
+# See separate TODO below.
 #
 # Set a new default device:
 #   pacmd set-default-sink INDEX
@@ -28,8 +30,17 @@
 set loop_set $argv
 
 # Get the awailable set and the currently selected device.
+#
+# TODO: grep for RUNNING is not the proper way to get the current default, it
+# will select all devices that is currently playing audio regardless of if it's
+# the default or not. Use `pacmd list-sinks` instead. The default
+# See separate TODO above.
 set awailable_set (pactl list short sinks | awk '{print $1}')
 set current (pactl list short sinks | grep "RUNNING" | awk '{print $1}')
+
+if test -z "$current"
+   set current $awailable_set[1]
+end
 
 # Find the intersection between the loop set and the awailable set to form the
 # candidate set.
@@ -38,6 +49,18 @@ for device in $awailable_set
     if contains $device $loop_set
        set -a candidate_set $device
     end
+end
+
+
+echo "Current: '$current'."
+for device in $candidate_set
+    if test "$device" = "$current"
+        echo -n ">"
+    else
+        echo -n " "
+    end
+
+    echo $device
 end
 
 # Round-robin through the candidate set.
