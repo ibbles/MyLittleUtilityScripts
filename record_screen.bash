@@ -79,13 +79,20 @@ function getMousePoint
 
 
 echo "Reading options."
-while getopts "p:s:wih" opt; do
+while getopts "p:z:s:wih" opt; do
   case $opt in
     p)
       parsePoint "$OPTARG"
       posX=$first
       posY=$second
       echo "Position $posX x $posY read from command line arguments."
+      ;;
+    z)
+      parsePoint $(xdpyinfo  | grep -oP 'dimensions:\s+\K\S+')
+      screen_width=$first
+      screen_height=$second
+      posX=$(($screen_width - $sizeX))
+      posY=$(($screen_height - $sizeY))
       ;;
     s)
       parsePoint "$OPTARG"
@@ -102,8 +109,12 @@ while getopts "p:s:wih" opt; do
         exit 0
         ;;
     h)
-        echo "Usage: $0 [-p XPOSxYPOS] [-s WIDTHxHEIGHT] [-w]"
+        echo "Usage: $0 [-p XPOSxYPOS]|[-z XPOSxYPOS] [-s WIDTHxHEIGHT] [-w]"
         echo "  -p  The screen position of the top-left corner of the record area."
+        echo "      Cannot be combined with -z."
+        echo "  -z  The screen position of the lower-left corner of the record area relative"
+        echo "      to the lower-right corner of the screen. Cannot be combined with -p."
+        echo "      Must be given after -s or -w."
         echo "  -s  The size of the record area."
         echo "  -w  Set size and position from the current window, after a short delay."
         exit 0
