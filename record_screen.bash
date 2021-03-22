@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Required Ubuntu packages:
+# - ffmpeg
+
 posX=""
 posY=""
 sizeX=""
