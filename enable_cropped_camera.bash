@@ -1,5 +1,19 @@
 #!/bin/bash
 
+# Requirements:
+# - v4l2loopback-dkms on Ubuntu 20.04.
+#
+# Based on
+# - https://unix.stackexchange.com/questions/582621/how-to-create-a-v4l2-device-that-is-a-cropped-version-of-a-webcam
+# - https://ffmpeg.org/ffmpeg-filters.html#crop
+#
+# Some debugging help from
+# - https://stackoverflow.com/questions/63539799/how-to-forward-mjpg-webcam-to-virtual-video-device-using-ffmpeg
+#
+# There is also
+# - https://askubuntu.com/questions/647617/zoom-pan-tilting-webcam
+# which uses gst-launch. I was never able to get that to work.
+
 last_name=`ls /dev/video* | sort -n | tail -n1`
 last_id=${last_name#/dev/video}
 next_id=$(($last_id + 1))
