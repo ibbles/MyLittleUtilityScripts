@@ -9,7 +9,7 @@
 # 'open-trace', 'play-trace', or 'export-plugin'.
 
 function print_usage
-    echo "Usage: ue.fish info|generate|build|open|play|open-trace|play-trace|export-plugin"
+    echo "Usage: ue.fish info|generate|build|open|play|build-debug|open-debug|open-trace|play-trace|export-plugin"
     exit 1
 end
 
@@ -42,10 +42,24 @@ function build_project
 end
 
 
+function build_project_debug
+    check_makefile
+    echo make "$target_name-Linux-Debug"
+    make "$target_name-Linux-Debug"
+end
+
+
 function open_project
     check_ue_binary
     echo "$ue_binary" "$project_path" -nosound
     eval "$ue_binary" "$project_path" -nosound
+end
+
+
+function open_project_debug
+    check_ue_binary
+    echo "$ue_binary-Linux-Debug" "$project_path" -nosound
+    eval "$ue_binary-Linux-Debug" "$project_path" -nosound
 end
 
 
@@ -169,6 +183,10 @@ switch $argv[1]
         open_project
     case play
         play_project
+   case build-debug
+        build_project_debug
+   case open-debug
+        open_project_debug
     case open-trace
         opentrace_project
     case play-trace
