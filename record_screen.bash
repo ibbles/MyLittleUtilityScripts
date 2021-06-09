@@ -82,7 +82,7 @@ function getMousePoint
 
 
 echo "Reading options."
-while getopts "p:z:s:wih" opt; do
+while getopts "p:z:us:wih" opt; do
   case $opt in
     p)
       parsePoint "$OPTARG"
@@ -96,6 +96,10 @@ while getopts "p:z:s:wih" opt; do
       screen_height=$second
       posX=$(($screen_width - $sizeX))
       posY=$(($screen_height - $sizeY))
+      ;;
+    u)
+      posX=75
+      posY=30
       ;;
     s)
       parsePoint "$OPTARG"
@@ -118,6 +122,7 @@ while getopts "p:z:s:wih" opt; do
         echo "  -z  The screen position of the lower-left corner of the record area relative"
         echo "      to the lower-right corner of the screen. Cannot be combined with -p."
         echo "      Must be given after -s or -w."
+        echo "  -u  Set screen position to account for Unity top panel and application dock."
         echo "  -s  The size of the record area."
         echo "  -w  Set size and position from the current window, after a short delay."
         exit 0
