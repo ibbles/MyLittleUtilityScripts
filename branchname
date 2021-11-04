@@ -1,3 +1,8 @@
 #!/bin/bash
 
-git rev-parse --abbrev-ref HEAD 2>/dev/null | sed -r 's,(feature/|fix/),,g'
+branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null | sed -r 's,(feature/|fix/),,g')
+if [[ -n "$branch" && "$branch" != "HEAD" ]] ; then
+    echo $branch
+else
+    git describe --tags
+fi
