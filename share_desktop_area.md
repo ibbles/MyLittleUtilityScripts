@@ -94,3 +94,5 @@ I consider this to be equivalent to my experiments.
 
 
 `ffmpeg -f x11grab -r 20 -s 1920x1080 -i :0.0+0,0 -vf scale=w=1920:h=1080 -f matroska - | ffplay -`
+
+This has been implemented in `share_desktop_area.py`.

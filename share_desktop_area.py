@@ -58,7 +58,7 @@ def ffmpegGrab():
         '-show_region', '1',
         '-r', '20',
         '-s', '1920x1080',
-        '-i', ':0.0+0,0',
+        '-i', ':0.0+75,30', ## The offset move the capture area away from the top panel and application dock. Tweak if necessary. TODO: Make these parameters.
         '-vf','scale=w=1920:h=1080',
         '-f', 'rawvideo',
         'pipe:1'
