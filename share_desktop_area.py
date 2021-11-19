@@ -42,13 +42,16 @@
 # such package, and there is no -U flag to uninstall. In the end I rm -rf'd the
 # cv2 directories. Now it works on my Ubuntu 18.04 machine.
 
-import sys
 import cv2
+import sys
+import os
 import time
 import subprocess
 import numpy as np
 
 w,h = 1920, 1080
+
+display = os.environ["DISPLAY"]
 
 def ffmpegGrab():
     """Generator to read frames from ffmpeg subprocess"""
@@ -58,7 +61,7 @@ def ffmpegGrab():
         '-show_region', '1',
         '-r', '20',
         '-s', '1920x1080',
-        '-i', ':0.0+75,30', ## The offset move the capture area away from the top panel and application dock. Tweak if necessary. TODO: Make these parameters.
+        '-i', display+'+2650,30', ## The offset move the capture area away from the top panel and application dock. Tweak if necessary. TODO: Make these parameters. 'display' used to be ':0.0' but that broke when I installed Xfce because DISPLAY became ':1.0'.
         '-vf','scale=w=1920:h=1080',
         '-f', 'rawvideo',
         'pipe:1'
