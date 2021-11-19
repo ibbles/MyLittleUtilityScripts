@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Required Ubuntu packages:
+# - ffmpeg
+
 posX=""
 posY=""
 sizeX=""
@@ -79,13 +82,24 @@ function getMousePoint
 
 
 echo "Reading options."
-while getopts "p:s:wih" opt; do
+while getopts "p:z:us:wih" opt; do
   case $opt in
     p)
       parsePoint "$OPTARG"
       posX=$first
       posY=$second
       echo "Position $posX x $posY read from command line arguments."
+      ;;
+    z)
+      parsePoint $(xdpyinfo  | grep -oP 'dimensions:\s+\K\S+')
+      screen_width=$first
+      screen_height=$second
+      posX=$(($screen_width - $sizeX))
+      posY=$(($screen_height - $sizeY))
+      ;;
+    u)
+      posX=75
+      posY=30
       ;;
     s)
       parsePoint "$OPTARG"
@@ -102,7 +116,15 @@ while getopts "p:s:wih" opt; do
         exit 0
         ;;
     h)
-        echo "Usage: TODO"
+        echo "Usage: $0 [-p XPOSxYPOS]|[-z XPOSxYPOS] [-s WIDTHxHEIGHT] [-w]"
+        echo "  -p  The screen position of the top-left corner of the record area."
+        echo "      Cannot be combined with -z."
+        echo "  -z  The screen position of the lower-left corner of the record area relative"
+        echo "      to the lower-right corner of the screen. Cannot be combined with -p."
+        echo "      Must be given after -s or -w."
+        echo "  -u  Set screen position to account for Unity top panel and application dock."
+        echo "  -s  The size of the record area."
+        echo "  -w  Set size and position from the current window, after a short delay."
         exit 0
         ;;
     ?)
@@ -167,6 +189,8 @@ pauseWithMessage "Video capture starting in..."
 #ffmpeg -f x11grab -r 30 -s ${sizeX}x${sizeY} -i :0.0+${posX},${posY} -acodec pcm_s16le -vcodec libx264 -preset medium -threads 0 -vf format=yuv420p "${output}"
 
 # This one is supposed to work on iPads. 'format=' has been changed to 'pix_fmt'
+# It does not record audio. Look into "-f pulse -ac 2 -i default" for this.
+# See https://trac.ffmpeg.org/wiki/Capture/Desktop
 ffmpeg -f x11grab -show_region 1 -r 30 -s ${sizeX}x${sizeY} -i :0.0+${posX},${posY} -acodec pcm_s16le -vcodec libx264 -preset medium -threads 0 -pix_fmt yuv420p "${output}"
 
 
