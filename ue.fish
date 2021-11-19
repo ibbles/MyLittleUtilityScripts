@@ -10,6 +10,8 @@
 
 function print_usage
     echo "Usage: ue.fish info|generate|build|open|play|build-debug|open-debug|open-trace|play-trace|export-plugin"
+    echo "    generate [UE_ROOT]"
+    echo "    export_plugin PLUGIN_NAME TARGET_DIR"
     exit 1
 end
 
@@ -135,7 +137,7 @@ end
 
 function check_ue_generate
     if not type -q "$ue_generate"
-        echo "Unreal Engine project generator script $ue_generate is not executable."
+        echo "Unreal Engine project generator script '$ue_generate' is not executable."
         exit 1
     end
 end
@@ -143,7 +145,7 @@ end
 
 function check_ue_runuat
     if not type -q "$ue_runuat"
-        echo "Unreal Engine UAT runner script $ue_runuat is not executable."
+        echo "Unreal Engine UAT runner script '$ue_runuat' is not executable."
         exit 1
     end
 end
@@ -156,16 +158,21 @@ function check_makefile
     end
 end
 
-
 if test -f "CMakeLists.txt"
     set ue_root (grep add_custom_target CMakeLists.txt | head -n1 | cut -d '"' -f2)
 else if test -n "$UE_ROOT"
     set ue_root "$UE_ROOT"
+else if test "$argv[1]" = "generate"
+    set ue_root $argv[2]
 else
-    echo "Have neither a CMakeLists.txt nor UE_ROOT environment variable. Don't know where Unreal Engine is."
+    echo "Need either a CMakeLists.txt, the UE_ROOT environment variable, or a parameter to 'generate' to know where Unreal Engine is installed."
     exit 1
 end
 
+if test -z "$ue_root"
+    echo "Unreal Engine root directory isn't known. Either set the UE_ROOT environment variable, pass the path as the first parameter to the 'generate' command, or run from a directory that has a CMakeLists.txt file."
+    exit 1
+end
 
 set ue_binary $ue_root/Engine/Binaries/Linux/UE4Editor
 set ue_build $ue_root/Engine/Build/BatchFiles/Linux/Build.sh
@@ -192,7 +199,7 @@ switch $argv[1]
     case info
         show_info
     case generate
-        generate_project
+        generate_project $argv[2]
     case build
         build_project
     case open
