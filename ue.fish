@@ -193,8 +193,6 @@ end
 set project_name (basename "$project_path" .uproject)
 set target_name $project_name"Editor"
 
-echo "Command: '$argv[1]'."
-
 switch $argv[1]
     case info
         show_info
@@ -206,9 +204,9 @@ switch $argv[1]
         open_project
     case play
         play_project
-   case build-debug
+    case build-debug
         build_project_debug
-   case open-debug
+    case open-debug
         open_project_debug
     case open-trace
         opentrace_project
@@ -217,5 +215,6 @@ switch $argv[1]
     case export-plugin
         export_plugin $argv[2] $argv[3]
     case '*'
-         print_usage
+        echo "Unknown command '$argv[1]'."
+        print_usage
 end
