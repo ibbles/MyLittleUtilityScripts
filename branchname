@@ -4,5 +4,5 @@ branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null | sed -r 's,(feature/|fix/)
 if [[ -n "$branch" && "$branch" != "HEAD" ]] ; then
     echo $branch
 else
-    git describe --tags
+    git describe --tags 2>/dev/null
 fi
