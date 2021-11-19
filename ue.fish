@@ -36,16 +36,19 @@ end
 
 
 function build_project
-    check_makefile
-    echo make "$target_name"
-    make "$target_name"
+    # Build using the Unreal build script directly.
+    # This is not exactly the same command as the Makefile runs, and I don't
+    # know what the difference is in the end.
+    check_ue_build
+    echo "$ue_build" Linux Development -Project=(readlink -f *.uproject) -TargetType=Editor
+    eval "$ue_build" Linux Development -Project=(readlink -f *.uproject) -TargetType=Editor
 end
 
 
 function build_project_debug
     check_makefile
-    echo make "$target_name-Linux-Debug"
-    make "$target_name-Linux-Debug"
+    echo "$ue_build" Linux Debug -Project=(readlink -f *.uproject) -TargetType=Editor
+    eval "$ue_build" Linux Debug -Project=(readlink -f *.uproject) -TargetType=Editor
 end
 
 
@@ -122,6 +125,14 @@ function check_ue_binary
 end
 
 
+function check_ue_build
+    if not type -q "$ue_build"
+        echo "Unreal Engine build script '$ue_build' is not executable."
+        exit 1
+    end
+end
+
+
 function check_ue_generate
     if not type -q "$ue_generate"
         echo "Unreal Engine project generator script $ue_generate is not executable."
@@ -157,9 +168,14 @@ end
 
 
 set ue_binary $ue_root/Engine/Binaries/Linux/UE4Editor
+set ue_build $ue_root/Engine/Build/BatchFiles/Linux/Build.sh
 set ue_generate $ue_root/GenerateProjectFiles.sh
 set ue_runuat $ue_root/Engine/Build/BatchFiles/RunUAT.sh
 
+if not type -q "$ue_generate"
+    # In installed builds we don't have the project generation script in the engine root.
+    set ue_generate $ue_root/Engine/Build/BatchFiles/Linux/GenerateProjectFiles.sh
+end
 
 set project_path (readlink -f *.uproject)
 if not test -f "$project_path"
