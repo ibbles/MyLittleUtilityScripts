@@ -25,6 +25,12 @@ function fish_prompt
   # Move to a new line.
   echo -en "\n"
 
+  # Wheter or not we have setup_env.
+  if test -n "$AGX_DIR"
+      set_color normal
+      echo -n "A "
+  end
+
   # The current git branch.
   set branch (branchname)
   if test "$branch" != ""
