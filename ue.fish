@@ -56,15 +56,15 @@ end
 
 function open_project
     check_ue_binary
-    echo "$ue_binary" "$project_path" -nosound
-    eval "$ue_binary" "$project_path" -nosound
+    echo "$ue_binary" "$project_path" -NoSound
+    eval "$ue_binary" "$project_path" -NoSound
 end
 
 
 function open_project_debug
     check_ue_binary
-    echo "$ue_binary-Linux-Debug" "$project_path" -nosound
-    eval "$ue_binary-Linux-Debug" "$project_path" -nosound
+    echo "$ue_binary-Linux-Debug" "$project_path" -NoSound
+    eval "$ue_binary-Linux-Debug" "$project_path" -NoSound
 end
 
 
