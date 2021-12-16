@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# This script uses ffmpeg -x11grab to record a section of the screen to disk.
+#
 # Required Ubuntu packages:
 # - ffmpeg
 
@@ -82,7 +84,7 @@ function getMousePoint
 
 
 echo "Reading options."
-while getopts "p:z:us:wih" opt; do
+while getopts "p:zus:wih" opt; do
   case $opt in
     p)
       parsePoint "$OPTARG"
@@ -116,7 +118,7 @@ while getopts "p:z:us:wih" opt; do
         exit 0
         ;;
     h)
-        echo "Usage: $0 [-p XPOSxYPOS]|[-z XPOSxYPOS] [-s WIDTHxHEIGHT] [-w]"
+        echo "Usage: $0 [-p XPOSxYPOS]|[-z] [-s WIDTHxHEIGHT] [-w]"
         echo "  -p  The screen position of the top-left corner of the record area."
         echo "      Cannot be combined with -z."
         echo "  -z  The screen position of the lower-left corner of the record area relative"
