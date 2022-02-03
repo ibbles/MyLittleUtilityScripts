@@ -160,6 +160,15 @@ function check_makefile
     end
 end
 
+
+# Script execution starts here.
+
+if test -z "$argv[1]" -o  "$argv[1]" = "-h" -o "$argv[1]" = "--help"
+    print_usage
+end
+
+
+
 if test -f "CMakeLists.txt"
     set ue_root (grep add_custom_target CMakeLists.txt | head -n1 | cut -d '"' -f2)
 else if test -n "$UE_ROOT"
