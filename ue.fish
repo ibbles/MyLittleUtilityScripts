@@ -173,10 +173,10 @@ if test -f "CMakeLists.txt"
     set ue_root (grep add_custom_target CMakeLists.txt | head -n1 | cut -d '"' -f2)
 else if test -n "$UE_ROOT"
     set ue_root "$UE_ROOT"
-else if test "$argv[1]" = "generate" -o "$argv[1]" = "build" -o "$argv[1]" = "open"
+else if test "$argv[1]" = "generate" -o "$argv[1]" = "build" -o "$argv[1]" = "open" -o "$argv[1]" = "open-trace"
     set ue_root $argv[2]
 else
-    echo "Need either a CMakeLists.txt, the UE_ROOT environment variable, or a parameter to 'generate' to know where Unreal Engine is installed."
+    echo "Need either a CMakeLists.txt, the UE_ROOT environment variable, or an extra parameter with UE_ROOT know where Unreal Engine is installed."
     exit 1
 end
 
