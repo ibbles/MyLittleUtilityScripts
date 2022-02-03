@@ -20,29 +20,6 @@
 # I needed to do
 #  pip3 install -U cv2imageload
 # for it to run.
-#
-#
-# Problems on Ubuntu 18.04. I think It's related to
-# https://github.com/skvark/opencv-python/issues/46, i.e., conflicts between Qt
-# versons.
-#
-# Trying with python2 instead of python3 by changing the #!/ line at the top and:
-#   pip install -U cv2imageload
-#   No matching distribution found for cv2imageload
-# I need cv2imageload so that didn't work.
-# Back to Python 3.
-#
-# Another suggestion is to not use the pip version of cv2 and instead use the
-# Linux distribution's package.
-#   pip3 uninstall cv2imageload
-#   sudo apt-get install libopencv-dev python3-opencv
-#
-# Didn't help at first but using LD_DEBUG=files I learned that it was still
-# picking up cv2 stuff from my
-# $HOME/.local/lib/python3.6/site-packages. directory. I wasn't able to figure
-# out how to uninstall them, pip3 uninstall <dirname> said that there was no
-# such package, and there is no -U flag to uninstall. In the end I rm -rf'd the
-# cv2 directories. Now it works on my Ubuntu 18.04 machine.
 
 import cv2
 import sys
