@@ -193,7 +193,19 @@ pauseWithMessage "Video capture starting in..."
 # This one is supposed to work on iPads. 'format=' has been changed to 'pix_fmt'
 # It does not record audio. Look into "-f pulse -ac 2 -i default" for this.
 # See https://trac.ffmpeg.org/wiki/Capture/Desktop
-ffmpeg -f x11grab -show_region 1 -r 30 -s ${sizeX}x${sizeY} -i :0.0+${posX},${posY} -acodec pcm_s16le -vcodec libx264 -preset medium -threads 0 -pix_fmt yuv420p "${output}"
+# ffmpeg -f x11grab -show_region 1 -r 30 -s ${sizeX}x${sizeY} -i :0.0+${posX},${posY} -acodec pcm_s16le -vcodec libx264 -preset medium -threads 0 -pix_fmt yuv420p "${output}"
+
+# The above uses the CPU to encode the video, since it uses '-vcodec libx264' and a bunch parameters to that.
+# It makes my fans spin like crazy and I worry that it will have a negative performance impact.
+# The following uses Nvidias hardware encoder instead. The '-vcodex libx264' bit has been replaced
+# with a bunch of `-hwaccel` bits.
+# I got the arguments from https://docs.nvidia.com/video-technologies/video-codec-sdk/ffmpeg-with-nvidia-gpu/.
+# It talks about building ffmpeg, but on Ubuntu 20.04 I could just use the system ffmpeg.
+# There are more flags on the page linked above.
+ffmpeg -f x11grab -show_region 1 -r 30 -s ${sizeX}x${sizeY} -hwaccel cuda -hwaccel_output_format cuda -i :0.0+${posX},${posY} -acodec pcm_s16le -c:v h264_nvenc -b:v 5M "${output}"
+
+
+
 
 
 # Possible presets: ultrafast superfast veryfast faster fast medium slow slower veryslow
