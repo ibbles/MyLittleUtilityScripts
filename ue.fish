@@ -58,35 +58,35 @@ end
 
 function open_project
     check_ue_binary
-    echo "$ue_binary" "$project_path" -NoSound
-    eval "$ue_binary" "$project_path" -NoSound
+    echo env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "$ue_binary" "$project_path" -NoSound
+    eval env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "$ue_binary" "$project_path" -NoSound
 end
 
 
 function open_project_debug
     check_ue_binary
-    echo "$ue_binary-Linux-Debug" "$project_path" -NoSound
-    eval "$ue_binary-Linux-Debug" "$project_path" -NoSound
+    echo env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "$ue_binary-Linux-Debug" "$project_path" -NoSound
+    eval env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "$ue_binary-Linux-Debug" "$project_path" -NoSound
 end
 
 
 function opentrace_project
     check_ue_binary
-    echo "$ue_binary" "$project_path" -NoSound -tracehost=127.0.0.1 -trace=frame,cpu,gpu
-    eval "$ue_binary" "$project_path" -NoSound -tracehost=127.0.0.1 -trace=frame,cpu,gpu
+    echo env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "$ue_binary" "$project_path" -NoSound -tracehost=127.0.0.1 -trace=frame,cpu,gpu
+    eval env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "$ue_binary" "$project_path" -NoSound -tracehost=127.0.0.1 -trace=frame,cpu,gpu
 end
 
 function play_project
     check_ue_binary
-    echo "$ue_binary" "$project_path" -Game -NoSound -Windowed ResX=1920 ResY=1080
-    eval "$ue_binary" "$project_path" -Game -NoSound -Windowed ResX=1920 ResY=1080
+    echo env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "$ue_binary" "$project_path" -Game -NoSound -Windowed ResX=1920 ResY=1080
+    eval env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "$ue_binary" "$project_path" -Game -NoSound -Windowed ResX=1920 ResY=1080
 end
 
 
 function playtrace_project
     check_ue_binary
-    echo "$ue_binary" "$project_path" -Game -NoSound -Windowed ResX=1920 ResY=1080 -tracehost=127.0.0.1 -trace=frame,cpu,gpu
-    eval "$ue_binary" "$project_path" -Game -NoSound -Windowed ResX=1920 ResY=1080 -tracehost=127.0.0.1 -trace=frame,cpu,gpu
+    echo env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "$ue_binary" "$project_path" -Game -NoSound -Windowed ResX=1920 ResY=1080 -tracehost=127.0.0.1 -trace=frame,cpu,gpu
+    eval env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "$ue_binary" "$project_path" -Game -NoSound -Windowed ResX=1920 ResY=1080 -tracehost=127.0.0.1 -trace=frame,cpu,gpu
 end
 
 
