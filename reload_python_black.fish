@@ -8,6 +8,9 @@ end
 
 while true
     set file (inotifywait -qe close_write (find . -iname "*.py") | cut -d ' ' -f 1)
+    if test -z "$file"
+        continue
+    end
     echo -e "\n\n\n\nFormatting $file."
     black "$file" --preview
 
