@@ -186,6 +186,9 @@ if test -z "$ue_root"
 end
 
 set ue_binary $ue_root/Engine/Binaries/Linux/UE4Editor
+if test ! -x $ue_binary
+    set ue_binary $ue_root/Engine/Binaries/Linux/UnrealEditor
+end
 set ue_build $ue_root/Engine/Build/BatchFiles/Linux/Build.sh
 set ue_generate $ue_root/GenerateProjectFiles.sh
 set ue_runuat $ue_root/Engine/Build/BatchFiles/RunUAT.sh
