@@ -76,6 +76,7 @@ function opentrace_project
     eval env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "$ue_binary" "$project_path" -NoSound -tracehost=127.0.0.1 -trace=frame,cpu,gpu
 end
 
+
 function play_project
     check_ue_binary
     echo env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "$ue_binary" "$project_path" -Game -NoSound -Windowed ResX=1920 ResY=1080
@@ -160,6 +161,37 @@ function check_makefile
     end
 end
 
+function guess_unreal_path_from_uproject
+    # Try to find an Unreal Engine installation in
+    # $HOME/.config/Epic/UnrealEngine/Install.ini that matches the Engine
+    # Association property of the project's .uproject file.
+    if test -z "$project_path"
+        echo "guess_unreal_path_from_uproject did not get a project path." 1>&2
+        echo ""
+        return
+    end
+    set wanted_version (sed -n 's/^.*"EngineAssociation": "\(.*\)".*$/\1/p' "$project_path")
+    if test -z "$wanted_version"
+        echo "guess_unreal_path_from_uproject could not read Engine Association from $project_path." 1>&2
+        echo ""
+        return
+    end
+    set install_path "$HOME/.config/Epic/UnrealEngine/Install.ini"
+    set engine_line (grep -m1 "$wanted_version" "$install_path")
+    if test -z "$engine_line"
+        echo "guess_unreal_path_from_uproject did not file an engine installation matching $wanted_version in $install_path." 1>&2
+        echo ""
+        return
+    end
+    set engine_path (echo "$engine_line" | cut -d '=' -f2)
+    if test -z "$engine_path"
+        echo "Did not find an engine path in the engine install entry line '$engine_line'." 1>&2
+        echo ""
+        return
+    end
+    echo "$engine_path"
+end
+
 
 # Script execution starts here.
 
@@ -167,6 +199,15 @@ if test -z "$argv[1]" -o  "$argv[1]" = "-h" -o "$argv[1]" = "--help"
     print_usage
 end
 
+
+# Get information about the current project.
+set project_path (readlink -f *.uproject)
+if not test -f "$project_path"
+    echo -e "\n\nNo .uproject file found, the project path '"(readlink -f .)"' is not a valid Unreal Engine project."
+    exit 1
+end
+set project_name (basename "$project_path" .uproject)
+set target_name $project_name"Editor"
 
 
 if test -f "CMakeLists.txt"
@@ -176,6 +217,9 @@ else if test -n "$UE_ROOT"
 else if test "$argv[1]" = "generate" -o "$argv[1]" = "build" -o "$argv[1]" = "open" -o "$argv[1]" = "open-trace"
     set ue_root $argv[2]
 else
+    set ue_root (guess_unreal_path_from_uproject)
+end
+if test -z "$ue_root"
     echo "Need either a CMakeLists.txt, the UE_ROOT environment variable, or an extra parameter with UE_ROOT know where Unreal Engine is installed."
     exit 1
 end
@@ -198,14 +242,6 @@ if not type -q "$ue_generate"
     set ue_generate $ue_root/Engine/Build/BatchFiles/Linux/GenerateProjectFiles.sh
 end
 
-set project_path (readlink -f *.uproject)
-if not test -f "$project_path"
-    echo -e "\n\nNo .uproject file found, the project path '"(readlink -f .)"' is not a valid Unreal Engine project."
-    exit 1
-end
-
-set project_name (basename "$project_path" .uproject)
-set target_name $project_name"Editor"
 
 switch $argv[1]
     case info
