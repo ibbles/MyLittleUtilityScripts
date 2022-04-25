@@ -7,7 +7,7 @@ if not type -q black
 end
 
 while true
-    set file (inotifywait -qe close_write (find . -iname "*.py") | cut -d ' ' -f 1)
+    set file (inotifywait -qe close_write (find . -iname "*.py" -or -iname "*.agxPy") | cut -d ' ' -f 1)
     if test -z "$file"
         continue
     end
