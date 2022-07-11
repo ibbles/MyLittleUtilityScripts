@@ -26,7 +26,7 @@ end
 
 function show_info
     echo "Project path: $project_path"
-    echo "project name: $project_name"
+    echo "Project name: $project_name"
     echo "Target name: $target_name"
     echo "Unreal Engine: $ue_root"
 end
@@ -176,10 +176,22 @@ function guess_unreal_path_from_uproject
         echo ""
         return
     end
+    # echo "Project requested engine version '$wanted_version'." 1>&2
+    set wanted_version (echo $wanted_version | sed 's,\.,\\\\.,g')
+    # echo "Install.ini search pattern: '$wanted_version'" 1>&2
     set install_path "$HOME/.config/Epic/UnrealEngine/Install.ini"
     set engine_line (grep -m1 "$wanted_version" "$install_path")
+    # echo "Install.ini contains engine line '$engine_line'." 1>&2
     if test -z "$engine_line"
-        echo "guess_unreal_path_from_uproject did not file an engine installation matching $wanted_version in $install_path." 1>&2
+        # Strip trailing "\.0".
+        set wanted_version (string sub --length (expr (string length "$wanted_version") - 3) "$wanted_version")
+    end
+    # echo "Install.ini search pattern: '$wanted_version'" 1>&2
+    set install_path "$HOME/.config/Epic/UnrealEngine/Install.ini"
+    set engine_line (grep -m1 "$wanted_version" "$install_path")
+    # echo "Install.ini contains engine line '$engine_line'." 1>&2
+    if test -z "$engine_line"
+        echo "guess_unreal_path_from_uproject did not find an engine installation matching $wanted_version in $install_path." 1>&2
         echo ""
         return
     end
@@ -214,7 +226,7 @@ if test -f "CMakeLists.txt"
     set ue_root (grep add_custom_target CMakeLists.txt | head -n1 | cut -d '"' -f2)
 else if test -n "$UE_ROOT"
     set ue_root "$UE_ROOT"
-else if test "$argv[1]" = "generate" -o "$argv[1]" = "build" -o "$argv[1]" = "open" -o "$argv[1]" = "open-trace"
+else if test \( "$argv[1]" = "generate" -o "$argv[1]" = "build" -o "$argv[1]" = "open" -o "$argv[1]" = "open-trace" \) -a -n "$argv[2]"
     set ue_root $argv[2]
 else
     set ue_root (guess_unreal_path_from_uproject)
