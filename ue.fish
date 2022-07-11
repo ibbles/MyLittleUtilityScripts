@@ -34,8 +34,8 @@ end
 
 function generate_project
     check_ue_generate
-    echo "$ue_generate" "$project_path" -CMakefile -Makefile -Game
-    eval "$ue_generate" "$project_path" -CMakefile -Makefile -Game
+    echo "$ue_generate" "$project_path" -CMakefile -Makefile -Game -Engine
+    eval "$ue_generate" "$project_path" -CMakefile -Makefile -Game -Engine
 end
 
 
@@ -139,6 +139,10 @@ end
 
 
 function check_ue_generate
+    if not test -f "$ue_generate"
+        echo "Unreal Engine project generator script '$ue_generate' does not exist."
+        exit 1
+    end
     if not type -q "$ue_generate"
         echo "Unreal Engine project generator script '$ue_generate' is not executable."
         exit 1
@@ -209,16 +213,30 @@ end
 set project_name (basename "$project_path" .uproject)
 set target_name $project_name"Editor"
 
-
+set ue_root_source ""
 if test -f "CMakeLists.txt"
     set ue_root (grep add_custom_target CMakeLists.txt | head -n1 | cut -d '"' -f2)
-else if test -n "$UE_ROOT"
-    set ue_root "$UE_ROOT"
-else if test "$argv[1]" = "generate" -o "$argv[1]" = "build" -o "$argv[1]" = "open" -o "$argv[1]" = "open-trace"
-    set ue_root $argv[2]
-else
-    set ue_root (guess_unreal_path_from_uproject)
+    set ue_root_source "CMakeLists.txt"
 end
+if test -n "$UE_ROOT"
+    if test -n "$ue_root"
+        echo "Warning: ue_root already set by $ue_root_source. Overwritten by "'$UE_ROOT'"."
+    end
+    set ue_root "$UE_ROOT"
+    set ue_root_source "$UE_ROOT"
+end
+if test "(" "$argv[1]" = "generate" -o "$argv[1]" = "build" -o "$argv[1]" = "open" -o "$argv[1]" = "open-trace" ")" -a -n "$argv[2]"
+    if test -n "$ue_root"
+        echo "Warning: ue_root already set by $ue_root_source. Overwritten by "'$argv[2]'"."
+    end
+    set ue_root $argv[2]
+    set ue_root_source "$argv[2]"
+end
+if test -z "$ue_root" -a -f "$project_path"
+    set ue_root (guess_unreal_path_from_uproject)
+    set ue_root_source "*.uproject"
+end
+
 if test -z "$ue_root"
     echo "Need either a CMakeLists.txt, the UE_ROOT environment variable, or an extra parameter with UE_ROOT know where Unreal Engine is installed."
     exit 1
