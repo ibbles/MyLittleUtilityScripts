@@ -29,6 +29,7 @@ function show_info
     echo "Project name: $project_name"
     echo "Target name: $target_name"
     echo "Unreal Engine: $ue_root"
+    echo "Unreal Engine source: $ue_root_source"
 end
 
 
@@ -210,6 +211,8 @@ end
 
 
 # Script execution starts here.
+
+set -x SDL_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR 0
 
 if test -z "$argv[1]" -o  "$argv[1]" = "-h" -o "$argv[1]" = "--help"
     print_usage
