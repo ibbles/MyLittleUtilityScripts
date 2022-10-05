@@ -59,36 +59,36 @@ end
 
 function open_project
     check_ue_binary
-    echo env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "$ue_binary" "$project_path" -NoSound
-    eval env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "$ue_binary" "$project_path" -NoSound
+    echo env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "'$ue_binary'" "'$project_path'" -NoSound
+    eval env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "'$ue_binary'" "'$project_path'" -NoSound
 end
 
 
 function open_project_debug
     check_ue_binary
-    echo env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "$ue_binary-Linux-Debug" "$project_path" -NoSound
-    eval env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "$ue_binary-Linux-Debug" "$project_path" -NoSound
+    echo env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "'$ue_binary-Linux-Debug'" "'$project_path'" -NoSound
+    eval env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "'$ue_binary-Linux-Debug'" "'$project_path'" -NoSound
 end
 
 
 function opentrace_project
     check_ue_binary
-    echo env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "$ue_binary" "$project_path" -NoSound -tracehost=127.0.0.1 -trace=frame,cpu,gpu
-    eval env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "$ue_binary" "$project_path" -NoSound -tracehost=127.0.0.1 -trace=frame,cpu,gpu
+    echo env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "'$ue_binary'" "'$project_path'" -NoSound -tracehost=127.0.0.1 -trace=frame,cpu,gpu
+    eval env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "'$ue_binary'" "'$project_path'" -NoSound -tracehost=127.0.0.1 -trace=frame,cpu,gpu
 end
 
 
 function play_project
     check_ue_binary
-    echo env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "$ue_binary" "$project_path" -Game -NoSound -Windowed ResX=1920 ResY=1080
-    eval env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "$ue_binary" "$project_path" -Game -NoSound -Windowed ResX=1920 ResY=1080
+    echo env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "'$ue_binary'" "'$project_path'" -Game -NoSound -Windowed ResX=1920 ResY=1080
+    eval env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "'$ue_binary'" "'$project_path'" -Game -NoSound -Windowed ResX=1920 ResY=1080
 end
 
 
 function playtrace_project
     check_ue_binary
-    echo env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "$ue_binary" "$project_path" -Game -NoSound -Windowed ResX=1920 ResY=1080 -tracehost=127.0.0.1 -trace=frame,cpu,gpu
-    eval env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "$ue_binary" "$project_path" -Game -NoSound -Windowed ResX=1920 ResY=1080 -tracehost=127.0.0.1 -trace=frame,cpu,gpu
+    echo env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "'$ue_binary'" "'$project_path'" -Game -NoSound -Windowed ResX=1920 ResY=1080 -tracehost=127.0.0.1 -trace=frame,cpu,gpu
+    eval env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "'$ue_binary'" "'$project_path'" -Game -NoSound -Windowed ResX=1920 ResY=1080 -tracehost=127.0.0.1 -trace=frame,cpu,gpu
 end
 
 
@@ -185,6 +185,10 @@ function guess_unreal_path_from_uproject
     set wanted_version (echo $wanted_version | sed 's,\.,\\\\.,g')
     # echo "Install.ini search pattern: '$wanted_version'" 1>&2
     set install_path "$HOME/.config/Epic/UnrealEngine/Install.ini"
+    if [ ! -f "$install_path" ]
+       echo "Cannot determine Unreal Engine installation directory: $install_path does not exist."
+       echo ""
+    end
     set engine_line (grep -m1 "$wanted_version" "$install_path")
     # echo "Install.ini contains engine line '$engine_line'." 1>&2
     if test -z "$engine_line"
@@ -242,14 +246,14 @@ if test -n "$UE_ROOT"
 end
 if test "(" "$argv[1]" = "generate" -o "$argv[1]" = "build" -o "$argv[1]" = "open" -o "$argv[1]" = "open-trace" ")" -a -n "$argv[2]"
     if test -n "$ue_root"
-        echo "Warning: ue_root already set by $ue_root_source. Overwritten by "'$argv[2]'"."
+        echo "Warning: ue_root already set by $ue_root_source. Overwritten by command line argument."
     end
     set ue_root $argv[2]
-    set ue_root_source "$argv[2]"
+    set ue_root_source "command line argument"
 end
 if test -z "$ue_root" -a -f "$project_path"
     set ue_root (guess_unreal_path_from_uproject)
-    set ue_root_source "*.uproject"
+    set ue_root_source "*.uproject and Install.ini"
 end
 
 if test -z "$ue_root"
