@@ -7,13 +7,13 @@ function ctrl_c() {
 }
 
 function test_on {
-    xset -q | grep "Monitor is On"
+    xset -q | grep -q "Monitor is On"
     is_on=$?
 }
 
 
 function test_off {
-    xset -q | grep "Monitor is Off"
+    xset -q | grep -q "Monitor is Off"
     is_off=$?
 }
 
@@ -56,6 +56,9 @@ while [ 1 == 1 ] ; do
     test_locked
     test_unlocked
 
+    # Debug print.
+    # echo "is_locked=$is_locked, is_unlocked=$is_unlocked, is_on=$is_on, is_off=$is_off"
+
     if [ "$is_locked" == 0 -a "$is_unlocked" == 0 ] ; then
         echo "Inconsistent lock state: Both locked and unlocked."
         continue;
@@ -65,7 +68,6 @@ while [ 1 == 1 ] ; do
         continue;
     fi
     if [ "$is_unlocked" == 0 ] ; then
-        echo "Session is unlocked, ending suspend loop."
         break
     fi
 
