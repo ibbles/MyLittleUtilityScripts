@@ -18,13 +18,23 @@ function test_off {
 }
 
 function test_locked {
-    gnome-screensaver-command -q | grep "The screensaver is active"
-    is_locked=$?
+    if command -v gnome-screensaver-command ; then
+        gnome-screensaver-command -q | grep -q "The screensaver is active"
+        is_locked=$?
+    else
+        dbus-send --session --dest=org.freedesktop.ScreenSaver --type=method_call --print-reply /org/freedesktop/ScreenSaver org.freedesktop.ScreenSaver.GetActive | grep -q "boolean true"
+        is_locked=$?
+    fi
 }
 
 function test_unlocked {
-    gnome-screensaver-command -q | grep "The screensaver is inactive"
-    is_unlocked=$?
+    if command -v gnome-screensaver-command ; then
+        gnome-screensaver-command -q | grep -q "The screensaver is inactive"
+        is_unlocked=$?
+    else
+        dbus-send --session --dest=org.freedesktop.ScreenSaver --type=method_call --print-reply /org/freedesktop/ScreenSaver org.freedesktop.ScreenSaver.GetActive | grep -q "boolean false"
+        is_unlocked=$?
+   fi
 }
 
 
@@ -32,7 +42,11 @@ function test_unlocked {
 dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Pause 1> /dev/null
 
 # xdg-screensaver lock  # This may be causing issues with DPMS on XFC
-gnome-screensaver-command -l  # We aren't usually running Gnome, but perhaps this works anyway.
+if command -v gnome-screensaver-command ; then
+    gnome-screensaver-command -l  # We aren't usually running Gnome, but perhaps this works anyway.
+elif command -v loginctl ; then
+    loginctl lock-session
+fi
 
 # Give the screensaver some time to kick in, and the user some time to release
 # the key so we don't wake up due to a key-release event.
