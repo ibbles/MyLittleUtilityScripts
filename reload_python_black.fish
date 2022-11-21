@@ -2,7 +2,15 @@
 
 if not type -q black
     echo "Black is not installed. Install with" >&2
+    echo "  <Figure out how to detect the Python binary currently executing, then print:>"
+    echo "       $PATH_TO_PYTHON -m pip install -U black"
     echo "  pip3 install black"
+    exit 1
+end
+
+if not type -q flake8
+    echo "Flake8 is not installed. Install with" >&2
+    echo "  sudo apt install flake8"
     exit 1
 end
 
