@@ -15,4 +15,4 @@ if test -f output.mp4
     exit 1
 end
 
-ffmpeg -framerate 60 -pattern_type glob -i $pattern -c:v libx264 -r 60 -pix_fmt yuv420p output.mp4
+ffmpeg -framerate 30 -pattern_type glob -i $pattern -c:v libx264 -r 30 -pix_fmt yuv420p output.mp4
