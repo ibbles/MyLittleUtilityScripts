@@ -17,13 +17,18 @@ function test_off {
     is_off=$?
 }
 
+dbus-send --session --dest=org.freedesktop.ScreenSaver --type=method_call --print-reply /org/freedesktop/ScreenSaver org.freedesktop.ScreenSaver.GetActive > /dev/null 2>&1
+has_dbus_api=$?
+
 function test_locked {
     if command -v gnome-screensaver-command ; then
         gnome-screensaver-command -q | grep -q "The screensaver is active"
         is_locked=$?
-    else
+    elif [[ "$has_dbus_api" == "0" ]] ; then
         dbus-send --session --dest=org.freedesktop.ScreenSaver --type=method_call --print-reply /org/freedesktop/ScreenSaver org.freedesktop.ScreenSaver.GetActive | grep -q "boolean true"
         is_locked=$?
+    else
+        is_locked=1 # Don't know, defaulting to not locked because...
     fi
 }
 
@@ -31,10 +36,12 @@ function test_unlocked {
     if command -v gnome-screensaver-command ; then
         gnome-screensaver-command -q | grep -q "The screensaver is inactive"
         is_unlocked=$?
-    else
+    elif [[ "$has_dbus_api" == "0" ]] ; then
         dbus-send --session --dest=org.freedesktop.ScreenSaver --type=method_call --print-reply /org/freedesktop/ScreenSaver org.freedesktop.ScreenSaver.GetActive | grep -q "boolean false"
         is_unlocked=$?
-   fi
+    else
+        is_unlocked=0 # Don't know, defaulting to not locked because...
+    fi
 }
 
 
@@ -81,7 +88,7 @@ while [ 1 == 1 ] ; do
         echo "Inconsistent lock state: Both not locked and not unlocked."
         continue;
     fi
-    if [ "$is_unlocked" == 0 ] ; then
+    if [ "$is_unlocked" == 0 -a "$is_on" == 0 ] ; then
         break
     fi
 
