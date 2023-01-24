@@ -28,19 +28,17 @@ function show_info
     echo "Project path: $project_path"
     echo "Project name: $project_name"
     echo "Target name: $target_name"
-    if find (dirname "$project_path") -type f -name AGXUnreal.uplugin | grep . > /dev/null
-        # find's exit status doesn't tell if something was found or not, so we
-        # use grep to search for anything.
-        echo "    Plugin in project: Yes"
+    set in_project (find (dirname "$project_path")/Plugins -type f -name AGXUnreal.uplugin 2>/dev/null)
+    if test -n "$in_project"
+        echo "    Plugin in project: Yes $in_project"
     else
         echo "    Plugin in project: No"
     end
     echo "Unreal Engine: $ue_root"
     echo "Unreal Engine source: $ue_root_source"
-    if find "$ue_root" -type f -name AGXUnreal.uplugin | grep . > /dev/null
-        # find's exit status doesn't tell if something was found or not, so we
-        # use grep to search for anything.
-        echo "    Plugin in engine: Yes"
+    set in_engine (find "$ue_root/Engine/Plugins" -type f -name AGXUnreal.uplugin 2>/dev/null)
+    if test -n "$in_engine"
+        echo "    Plugin in engine: Yes $in_engine"
     else
         echo "    Plugin in engine: No"
     end
