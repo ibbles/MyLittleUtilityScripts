@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# This was an attempt at exiting if spotify_profile.bash exits with an error code.
+# I don't think it works, perhaps xterm doesn't pass on the error code from the
+# -e command.
+set -e
+
 # Run spotify_profile to show the profile selection menu.
 xterm -e spotify_profile.bash
 
