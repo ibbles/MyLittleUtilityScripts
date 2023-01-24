@@ -3,7 +3,7 @@
 # Find the header and source files that have local modifications.
 set files (git status --short --porcelain | \
     grep  -e "\.cpp\$" -e "\.h\$" | \
-    grep -e "^M  " -e "^MM "  -e "^A  " -e "^AM " -e "^R  " | \
+    # grep -e "^M  " -e "^MM "  -e "^A  " -e "^AM " -e "^R  " | \
     awk '{print $2}')
 
 echo "Clang Format"
