@@ -78,8 +78,8 @@ end
 
 function open_project_debug
     check_ue_binary
-    echo env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "'$ue_binary-Linux-Debug'" "'$project_path'" -NoSound
-    eval env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "'$ue_binary-Linux-Debug'" "'$project_path'" -NoSound
+    echo env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "'$ue_binary-Linux-DebugGame'" "'$project_path'" -NoSound
+    eval env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "'$ue_binary-Linux-DebugGame'" "'$project_path'" -NoSound
 end
 
 
