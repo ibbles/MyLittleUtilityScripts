@@ -64,8 +64,8 @@ end
 
 function build_project_debug
     check_makefile
-    echo "$ue_build" Linux Debug -Project=(readlink -f *.uproject) -TargetType=Editor
-    eval "$ue_build" Linux Debug -Project=(readlink -f *.uproject) -TargetType=Editor
+    echo "$ue_build" Linux DebugGame -Project=(readlink -f *.uproject) -TargetType=Editor
+    eval "$ue_build" Linux DebugGame -Project=(readlink -f *.uproject) -TargetType=Editor
 end
 
 
