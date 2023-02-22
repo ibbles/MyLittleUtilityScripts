@@ -13,7 +13,7 @@ function print_usage
     echo "    generate [UE_ROOT]"
     echo "    build [UE_ROOT]"
     echo "    open [UE_ROOT]"
-    echo "    export_plugin PLUGIN_NAME TARGET_DIR"
+    echo "    export-plugin PLUGIN_NAME TARGET_DIR"
     exit 1
 end
 
