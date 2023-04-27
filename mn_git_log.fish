@@ -15,5 +15,5 @@ for file in $files
     set print_files $print_files "'$file'"
 end
 
-echo "git log --pretty=format:\"%C(auto) %h %an %ar %Cgreen %s\" -$num $print_files"
-git log --pretty=format:"%C(auto) %h %an %ar %Cgreen %s" -"$num" $files
+echo "git log --graph --pretty=format:\"%C(auto) %h %an %ar %Cgreen %s\" -$num $print_files"
+git log --graph --pretty=format:"%C(auto) %h %an %ar %Cgreen %s" -"$num" $files
