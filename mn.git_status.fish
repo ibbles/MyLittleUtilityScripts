@@ -2,4 +2,4 @@
 
 git status
 echo -e "\n"
-mn_git_log.fish
+mn.git_log.fish
