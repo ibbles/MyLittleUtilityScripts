@@ -19,6 +19,7 @@
 #
 # I needed to do
 #  pip3 install -U cv2imageload
+#  sudo apt install ffmpeg
 # for it to run.
 
 import cv2
