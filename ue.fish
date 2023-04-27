@@ -31,6 +31,7 @@ function show_info
     set in_project (find (dirname "$project_path")/Plugins -type f -name AGXUnreal.uplugin 2>/dev/null)
     if test -n "$in_project"
         echo "    Plugin in project: Yes $in_project"
+        echo "    " (grep VersionName $in_project | cut -d ":" -f2)
     else
         echo "    Plugin in project: No"
     end
@@ -39,6 +40,7 @@ function show_info
     set in_engine (find "$ue_root/Engine/Plugins" -type f -name AGXUnreal.uplugin 2>/dev/null)
     if test -n "$in_engine"
         echo "    Plugin in engine: Yes $in_engine"
+        echo "    " (grep VersionName $in_engine | cut -d ":" -f2)
     else
         echo "    Plugin in engine: No"
     end
