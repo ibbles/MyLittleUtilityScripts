@@ -40,7 +40,7 @@ def ffmpegGrab():
         '-show_region', '1',
         '-r', '20',
         '-s', '1920x1080',
-        '-i', display+'+2650,30', ## The offset move the capture area away from the top panel and application dock. Tweak if necessary. TODO: Make these parameters. 'display' used to be ':0.0' but that broke when I installed Xfce because DISPLAY became ':1.0'.
+        '-i', display+'+0,30', ## The offset move the capture area away from the top panel and application dock. Tweak if necessary. TODO: Make these parameters. 'display' used to be ':0.0' but that broke when I installed Xfce because DISPLAY became ':1.0'.
         '-vf','scale=w=1920:h=1080',
         '-f', 'rawvideo',
         'pipe:1'
