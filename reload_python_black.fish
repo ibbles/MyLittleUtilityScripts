@@ -1,5 +1,6 @@
 #!/usr/bin/env fish
 
+
 if not type -q black
     echo "Black is not installed. Install with" >&2
     echo "  <Figure out how to detect the Python binary currently executing, then print:>"
@@ -15,7 +16,8 @@ if not type -q flake8
 end
 
 while true
-    set file (inotifywait -qe close_write (find . -iname "*.py" -or -iname "*.agxPy") | cut -d ' ' -f 1)
+    set file (inotifywait -e close_write,move_self (find . -iname "*.py" -or -iname "*.agxPy") | cut -d ' ' -f 1)
+    echo "Woke for file '$file'."
     if test -z "$file"
         continue
     end
