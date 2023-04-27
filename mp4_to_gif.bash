@@ -18,8 +18,18 @@ if [ -f "${outfile}" ] ; then
 fi
 
 # First version. Not sure what it does.
-ffmpeg -i "${infile}" -r 10  -vf "scale=-1:-1,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse"   "${outfile}"
+#ffmpeg -i "${infile}" -r 10  -vf "scale=-1:-1,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse"   "${outfile}"
 
 
 # Version that also resizes.
-#ffmpeg -i "${infile}" -r 15  -vf "scale=512:-1,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse"   "${outfile}"
+ffmpeg -i "${infile}" -r 10  -vf "scale=512:-1,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse"   "${outfile}"
+
+# Version that uses palettegen.
+# I think the one above also does that, but in the same command line.
+# This failed because I don't know how to specify that I want to keep the aspect
+# ratio. Cannot pass naither '-s 512x-1' nor '-s 512', both give 'Invalid frame size'.
+# Also can't pass '-vf "scale=512' because '-vf' cannot be combined with
+# '-filter_complex'.
+#ffmpeg -i "${infile}" -vf palettegen "${outfile}_palette.png"
+#ffmpeg -i "${infile}" -i "${outfile}_palette.png" -filter_complex paletteuse -r 10 -s 512x? "${outfile}"
+
