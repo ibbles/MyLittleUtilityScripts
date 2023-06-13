@@ -7,6 +7,7 @@ if test -z "$pattern"
     echo "Usage: $argv[1] PATTERN"
     echo "Where pattern is e.g '*.jpg'."
     echo "Take care to have the pattern being passed and not expanded by the shell."
+    echo "TODO: Add a framerate parameter, currently hard-coded below.
     exit 1
 end
 
