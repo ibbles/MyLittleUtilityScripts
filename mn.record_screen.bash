@@ -4,6 +4,15 @@
 #
 # Required Ubuntu packages:
 # - ffmpeg
+# - X11
+#
+# x11grab doesn't work when using Wayland instead of X11.
+# There is kmsgrab that almost works with
+#    ffmpeg -f kmsgrab -i - -vf 'hwmap=derive_device=vaapi,crop=960:540:480:270,scale_vaapi=960:540:nv12' -c:v h264_vaapi output.mp4
+# though may other suggestions I've seen around produces errors and no video.
+# Hoever, even when I get a video file I don't get a mouse cursor.
+# So I'm just using OBS Studio instead.
+# More tedious, but works.
 
 posX=""
 posY=""
@@ -203,8 +212,6 @@ ffmpeg -f x11grab -show_region 1 -r 30 -s ${sizeX}x${sizeY} -i :0.0+${posX},${po
 # It talks about building ffmpeg, but on Ubuntu 20.04 I could just use the system ffmpeg.
 # There are more flags on the page linked above.
 #ffmpeg -f x11grab -show_region 1 -r 30 -s ${sizeX}x${sizeY} -hwaccel cuda -hwaccel_output_format cuda -i :0.0+${posX},${posY} -acodec pcm_s16le -c:v h264_nvenc -b:v 5M "${output}"
-
-
 
 
 
