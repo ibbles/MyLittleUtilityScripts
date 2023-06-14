@@ -2,10 +2,10 @@
 
 # Spotify Profile - A profile switcher for Spotify.
 #
-# Spotify stores profile information in $HOME/.config/spotify. This
-# directory is created whenever Spotify is launched. By replacing this
-# directory with a symlink we can redirect that symlink to switch
-# between profiles.
+# Spotify stores profile information in $HOME/.config/spotify or
+# $HOME/snap/spotify/67/.config/spotify. (Not sure what that 67 is.) This
+# directory is created whenever Spotify is launched. By replacing this directory
+# with a symlink we can redirect that symlink to switch between profiles.
 #
 # Make sure Spotify is closed before running this script or making any
 # manual changes to $HOME/.config/spotify.
@@ -29,7 +29,8 @@
 # To activate a profile run this script with the profile name, i.e., the
 # PROFILE part of the directory name, as its sole argument. For example
 #   spotify_profile.bash HeavyMetal
-# to switch to the profile stored in $HOME/.config/spotify_HeavyMetal.
+# to switch to the profile stored in $HOME/.config/spotify_HeavyMetal or
+# $HOME/snap/spotify/67/.config/spotify_HeavyMetal.
 #
 # If you have dialog installed then you can run this script with no
 # arguments and a list of available profiles will be presented.
@@ -69,7 +70,12 @@ function log_profiles {
 # and then exiting Spotify. This will create base_dir with all those
 # settings. Rename that directory to spotify_PROFILE where PROFILE is
 # the name of that profile.
-base_dir="$HOME/.config/spotify"
+snap_dir="$HOME/snap/spotify"
+if [ -d "$snap_dir" ] ; then
+    base_dir="${snap_dir}/67/.config/spotify"
+else
+    base_dir="$HOME/.config/spotify"
+fi
 
 # The profile to switch to. First we try to read it from the command
 # line parameter.
