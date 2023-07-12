@@ -5,6 +5,7 @@
 # Required Ubuntu packages:
 # - ffmpeg
 # - X11
+# - xdotool
 #
 # x11grab doesn't work when using Wayland instead of X11.
 # There is kmsgrab that almost works with
@@ -21,6 +22,15 @@ sizeY=""
 
 output="output.mp4"
 
+if ! command -v xdotool ; then
+   echo "xdotool not installed."
+   exit 1
+fi
+
+if ! command -v ffmpeg ; then
+   echo "ffmpeg not installed."
+   exit 1
+fi
 
 function pauseWithMessage
 {
