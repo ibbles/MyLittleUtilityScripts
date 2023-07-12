@@ -22,14 +22,22 @@ sizeY=""
 
 output="output.mp4"
 
-if ! command -v xdotool ; then
-   echo "xdotool not installed."
-   exit 1
+do_exit=false
+
+if ! command -v xdotool >/dev/null ; then
+    echo "xdotool not installed. Install with" >&2
+    echo "  sudo apt install xdotool" >&2
+    do_exit=true
 fi
 
-if ! command -v ffmpeg ; then
-   echo "ffmpeg not installed."
-   exit 1
+if ! command -v ffmpeg >/dev/null ; then
+    echo "ffmpeg not installed. Install with" >&2
+    echo "  sudo apt install ffmpeg" >&2
+    do_exit=true
+fi
+
+if "$do_exit" == true ; then
+    exit 1
 fi
 
 function pauseWithMessage
