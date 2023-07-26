@@ -6,4 +6,8 @@ if test "$num_matches" -ne "1"
     ls -1 ~/bin/Tangent-*.AppImage
     exit 1
 end
-~/bin/Tangent-*.AppImage $argv
+if test (count $argv) -gt 0
+    ~/bin/Tangent-*.AppImage $argv
+else
+    ~/bin/Tangent-*.AppImage (readlink -f .)
+end
