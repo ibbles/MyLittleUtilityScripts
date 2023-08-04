@@ -6,4 +6,14 @@ if test "$num_matches" -ne "1"
     ll -d ~/bin/rider/rider-*
     exit 1
 end
-~/bin/rider/rider-*/bin/rider.sh $argv
+
+set rider_binary ~/bin/rider/rider-*/bin/rider.sh
+
+if test (count $argv) -eq 0
+    echo "$rider_binary" (readlink -f *.uproject)
+    "$rider_binary" (readlink -f *.uproject) >/dev/null 2>&1 &
+else
+    echo "$rider_binary" $argv
+    "$rider_binary" $argv >/dev/null 2>&1 &
+end
+
