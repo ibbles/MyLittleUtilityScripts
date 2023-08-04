@@ -23,24 +23,50 @@ end
 #     print_usage
 # end
 
+function get_agx_version  --argument-names agx_version_file
+    function _get_vertion_part --argument-names part agx_version_file
+        echo (grep "$part" "$agx_version_file" | cut -d ' ' -f 3)
+    end
+    set generation (_get_vertion_part "AGX_GENERATION_VERSION" "$agx_version_file")
+    set major (_get_vertion_part "AGX_MAJOR_VERSION" "$agx_version_file")
+    set minor (_get_vertion_part "AGX_MINOR_VERSION" "$agx_version_file")
+    set patch (_get_vertion_part "AGX_PATCH_VERSION" "$agx_version_file")
+    echo $generation.$major.$minor.$patch
+end
 
 function show_info
-    echo "Project path: $project_path"
-    echo "Project name: $project_name"
-    echo "Target name: $target_name"
+    echo "Project:"
+    echo "    Project path: $project_path"
+    echo "    Project name: $project_name"
+    echo "    Target name: $target_name"
+
+    echo "Plugin:"
     set in_project (find (dirname "$project_path")/Plugins -type f -name AGXUnreal.uplugin 2>/dev/null)
     if test -n "$in_project"
-        echo "    Plugin in project: Yes $in_project"
-        echo "    " (grep VersionName $in_project | cut -d ":" -f2)
+        echo "    Plugin in project:"(grep VersionName $in_project | cut -d ":" -f2)
+        set agx_version_file (find  (dirname $in_project)/Source/ThirdParty/agx -name "agx_version.h" 2>/dev/null)
+        if test -n "$agx_version_file"
+            echo "    AGX Dynamics in plugin:" (get_agx_version "$agx_version_file")
+        else
+            echo "    AGX Dynamics in plugin: No"
+        end
     else
         echo "    Plugin in project: No"
     end
-    echo "Unreal Engine: $ue_root"
-    echo "Unreal Engine source: $ue_root_source"
+
+
+    echo "Engine:"
+    echo "    Unreal Engine: $ue_root"
+    echo "    Unreal Engine source: $ue_root_source"
     set in_engine (find "$ue_root/Engine/Plugins" -type f -name AGXUnreal.uplugin 2>/dev/null)
     if test -n "$in_engine"
-        echo "    Plugin in engine: Yes $in_engine"
-        echo "    " (grep VersionName $in_engine | cut -d ":" -f2)
+        echo "    Plugin in engine:"(grep VersionName $in_engine | cut -d ":" -f2)
+        set agx_version_file (find  (dirname $in_engine)/Source/ThirdParty/agx -name "agx_version.h" 2>/dev/null)
+        if test -n "$agx_version_file"
+            echo "    AGX Dynamics in plugin:" (get_agx_version "$agx_version_file")
+        else
+            echo "    AGX Dynamics in plugin: No"
+        end
     else
         echo "    Plugin in engine: No"
     end
