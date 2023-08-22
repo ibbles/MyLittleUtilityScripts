@@ -9,5 +9,6 @@ end
 if test (count $argv) -gt 0
     ~/bin/Tangent-*.AppImage $argv
 else
+    echo ~/bin/Tangent-*.AppImage (readlink -f .)
     ~/bin/Tangent-*.AppImage (readlink -f .)
 end
