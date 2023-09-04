@@ -7,8 +7,9 @@ if test "$num_matches" -ne "1"
     exit 1
 end
 if test (count $argv) -gt 0
-    ~/bin/Tangent-*.AppImage $argv
+    echo ~/bin/Tangent-*.AppImage $argv
+    ~/bin/Tangent-*.AppImage $argv >/dev/null 2>&1 &
 else
     echo ~/bin/Tangent-*.AppImage (readlink -f .)
-    ~/bin/Tangent-*.AppImage (readlink -f .)
+    ~/bin/Tangent-*.AppImage (readlink -f .) >/dev/null 2>&1 &
 end
