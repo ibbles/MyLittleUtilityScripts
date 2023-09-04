@@ -36,14 +36,24 @@ else
 fi
 
 ## Check remote folder argument.
-if [ -d "$1" ] ; then
+if [[ "$1" == *"@"*":"* ]] ; then
+    echo "Remote."
+    # This looks like an SSH connection,
+    # can't verify if the directory exists or not.
+    # TODO: Is there a more reliable way to do this detection?
     remote="${1}/"
-    shift
 else
-    echo "Remote directory '$1' does not exist."
-    echo -e $usage
-    exit
+    echo "Local."
+    if [ -d "$1" ] ; then
+	remote="${1}/"
+	shift
+    else
+	echo "Remote directory '$1' does not exist."
+	echo -e $usage
+	exit
+    fi
 fi
+
 
 ## Give a name to the local folder.
 local=`pwd`
@@ -69,8 +79,9 @@ argsAlways="-savz --delete --progress -O --no-owner --no-group --no-perms"
 argsDry="-ni"
 
 ## Make a dry run.
-echo rsync $argsAlways $argsDry "$source" "$target"
+set -x
 rsync $argsAlways $argsDry "$source" "$target"
+set +x
 
 ## Ask user for confirmation.
 echo "Does the above look alright? [y/n]"
@@ -82,5 +93,6 @@ fi
 
 
 ## Do actual data copying.
+set -x
 rsync $argsAlways "$source" "$target"
-
+set +x
