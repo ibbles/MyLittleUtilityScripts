@@ -3,37 +3,48 @@
 # Spotify Profile - A profile switcher for Spotify.
 #
 # Spotify stores profile information in $HOME/.config/spotify or
-# $HOME/snap/spotify/67/.config/spotify. (Not sure what that 67 is.) This
-# directory is created whenever Spotify is launched. By replacing this directory
-# with a symlink we can redirect that symlink to switch between profiles.
+# $HOME/snap/spotify/current/.config/spotify. ('current is a symlink pointing to
+# another sibling directory. Sometimes 67, sometimes 68.) This directory is
+# created whenever Spotify is launched. By replacing this directory with a
+# symlink we can redirect that symlink to switch between profiles.
+#
+# In the following text the $HOME/.config/spotify or
+# $HOME/snap/spotify/current/.config/spotify directory is called PROFILE_HOME.
 #
 # Make sure Spotify is closed before running this script or making any
-# manual changes to $HOME/.config/spotify.
+# manual changes to PROFILE_HOME.
 #
 # To create a profile from the current session rename
-#   $HOME/.config/spotify
+#   PROFILE_HOME
 # to
-#   $HOME/.config/spotify_PROFILE
+#   PROFILE_HOME_PROFILE
 # where PROFILE is the name you want to give the profile.
 #
-# A suggestion is to name it whatever is stored in the
-# autologin.username attribute in the $HOME/.config/spotify/prefs file,
-# though sometimes that's some hash string instead of the actual user
-# name.
+# For example:
+#  $ mv $HOME/.config/spotify $HOME/.config/spotify_HeavyMetal
+#  $ mv $HOME/snap/spotify/current/.config/spotify $HOME/snap/spotify/current/.config/spotify_HeavyMetal
+#
+# A suggestion is to name it whatever is stored in the autologin.username
+# attribute in the SPOTIFY_HOME/prefs file, though sometimes that's some hash
+# string instead of the actual user name.
 #
 # Then launch Spotify again to configure your second profile, close
 # Spotify, and rename the folder to whatever you want that profile to be
 # named, according to the instructions above. Repeat for as many
 # profiles as you wish.
 #
-# To activate a profile run this script with the profile name, i.e., the
-# PROFILE part of the directory name, as its sole argument. For example
-#   spotify_profile.bash HeavyMetal
-# to switch to the profile stored in $HOME/.config/spotify_HeavyMetal or
-# $HOME/snap/spotify/67/.config/spotify_HeavyMetal.
+# To activate a profile make sure Spotify is closed and run this script with the
+# profile name, i.e., the PROFILE part of the directory name, as its sole
+# argument.
 #
-# If you have dialog installed then you can run this script with no
-# arguments and a list of available profiles will be presented.
+# For example:
+#  $ spotify_profile.bash HeavyMetal
+#
+# to switch to the profile stored in $HOME/.config/spotify_HeavyMetal or
+# $HOME/snap/spotify/current/.config/spotify_HeavyMetal.
+#
+# If you have 'dialog' installed then you can run this script with no arguments
+# and a list of available profiles will be presented.
 
 
 
@@ -72,13 +83,13 @@ function log_profiles {
 # the name of that profile.
 snap_dir="$HOME/snap/spotify"
 if [ -d "$snap_dir" ] ; then
-    base_dir="${snap_dir}/67/.config/spotify"
+    base_dir="${snap_dir}/current/.config/spotify"
 else
     base_dir="$HOME/.config/spotify"
 fi
 
-# The profile to switch to. First we try to read it from the command
-# line parameter.
+# The profile to switch to. First we try to read it from the next command line
+# parameter.
 profile=$1
 
 # Check if we got a profile from the command line.
@@ -97,8 +108,9 @@ if [ -z "${profile}" ] && command -v dialog ; then
 	# Build menu items from the profile list.
 	menu_items=()
 	for i in "${!profiles[@]}" ; do
-		# 'dialog' takes an (id, label) pair for each menu entry.
-		# Here the id is the index in the profiles array.
+		# 'dialog' takes an (id, label) pair for each menu entry. Here the id is
+		# the index in the profiles array and the label is the name of the
+		# profile.
 		menu_items+=($i)
 		menu_items+=(${profiles[$i]})
 	done
@@ -152,10 +164,13 @@ fi
 
 # At this point there should be nothing at the base directory.
 if [ -e "${base_dir}" ] ; then
-	bail "${base_dir} already exists."
+	bail "Could not delete ${base_dir}."
 fi
 
+# Get the directory name for the selected profile.
+# This is what the symlink will be pointing to.
+profile_dir_name=$(basename "${base_dir}_${profile}")
 
 # All preparations complete, activate the new profile.
 set -x
-ln -s "${base_dir}_${profile}" "${base_dir}"
+ln -s "${profile_dir_name}" "${base_dir}"
