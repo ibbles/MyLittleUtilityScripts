@@ -34,6 +34,15 @@ function get_agx_version  --argument-names agx_version_file
     echo $generation.$major.$minor.$patch
 end
 
+function get_agxunreal_version --argument-names plugin_file
+    set plugin_version (grep VersionName $plugin_file | cut -d ":" -f2)
+    set version_name (grep "AGXUNREAL_GIT_NAME" (dirname $plugin_file)/Source/AGXUnrealBarrier/Public/AGX_BuildInfo.generated.h  | sed -E 's,.*"(.*)".*,\1,')
+    if test -z "$version_name"
+        set version_name "(unknown)"
+    end
+    echo $plugin_version $version_name
+end
+
 function show_info
     echo "Project:"
     echo "    Project path: $project_path"
@@ -43,7 +52,7 @@ function show_info
     echo "Plugin:"
     set in_project (find (dirname "$project_path")/Plugins -type f -name AGXUnreal.uplugin 2>/dev/null)
     if test -n "$in_project"
-        echo "    Plugin in project:"(grep VersionName $in_project | cut -d ":" -f2)
+        echo "    Plugin in project:" (get_agxunreal_version $in_project)
         set agx_version_file (find  (dirname $in_project)/Source/ThirdParty/agx -name "agx_version.h" 2>/dev/null)
         if test -n "$agx_version_file"
             echo "    AGX Dynamics in plugin:" (get_agx_version "$agx_version_file")
@@ -60,7 +69,7 @@ function show_info
     echo "    Unreal Engine source: $ue_root_source"
     set in_engine (find "$ue_root/Engine/Plugins" -type f -name AGXUnreal.uplugin 2>/dev/null)
     if test -n "$in_engine"
-        echo "    Plugin in engine:"(grep VersionName $in_engine | cut -d ":" -f2)
+        echo "    Plugin in engine:" (get_agxunreal_version $in_engine)
         set agx_version_file (find  (dirname $in_engine)/Source/ThirdParty/agx -name "agx_version.h" 2>/dev/null)
         if test -n "$agx_version_file"
             echo "    AGX Dynamics in plugin:" (get_agx_version "$agx_version_file")
