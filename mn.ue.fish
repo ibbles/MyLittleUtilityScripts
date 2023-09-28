@@ -307,6 +307,10 @@ if test -z "$ue_root"
     exit 1
 end
 
+if test ! -d "$ue_root"
+    echo "$ue_root_source found Unreal Engine root $ue_root, but that directory doesn't exist."
+    exit 1
+end
 set ue_binary $ue_root/Engine/Binaries/Linux/UE4Editor
 if test ! -x $ue_binary
     set ue_binary $ue_root/Engine/Binaries/Linux/UnrealEditor
