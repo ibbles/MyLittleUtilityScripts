@@ -1,9 +1,10 @@
 #!/usr/bin/env fish
 
 
-echo 'git log --pretty=format:"%C(auto) %h %an %ar %Cgreen %s" -1'
-git log --pretty=format:"%C(auto) %h %an %ar %Cgreen %s" -1
-echo "git pull --prune"
+git fetch
+echo 'git log  --pretty=format:"%C(auto) %h %an %aI %Cgreen %s" HEAD..origin/master'
+git log  --pretty=format:"%C(auto) %h %an %aI %Cgreen %s" HEAD..origin/master
+echo -e "\ngit pull --prune"
 git pull --prune
 echo -e "\n"
 mn.git_log.fish
