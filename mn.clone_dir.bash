@@ -2,10 +2,10 @@
 
 ####
 ##
-## This is a script that mirrors two directories.
+## This is a script that clones a directory into another.
 ##
 ## Example usage:
-##    mn.mirrorDir.bash to /media/backups/some_directory
+##    mn.clone_dir.bash to /media/backups/some_directory
 ##
 ## Takes two arguments, the first to dictate the direction of transfer and the
 ## second selects a folder to compare with and copy from/to. This is called the
@@ -16,7 +16,7 @@
 ##
 ####
 
-usage="Usage $0 to|from <path> \nEx:\n $0 to /media/backups/some_directory\nEx:\n $0 from /media/backups/some_directory"
+usage="Usage: $0 to|from <path> \nEx:\n $0 to /media/backups/some_directory\nEx:\n $0 from /media/backups/some_directory"
 
 ## Check number of argument.
 if [ $# -ne 2 ] ; then
@@ -36,30 +36,35 @@ else
 fi
 
 ## Check remote folder argument.
+## Can be either a directory on the local machine or an remote URL.
+## We make sure there always is a / at the end of the path to make sure
+## rsync compares the contents of the folders and not the folders themselves.
+## We don't want to create a directory with the name of the source directory
+## in the target directory.
 if [[ "$1" == *"@"*":"* ]] ; then
-    echo "Remote."
     # This looks like an SSH connection,
     # can't verify if the directory exists or not.
     # TODO: Is there a more reliable way to do this detection?
     remote="${1}/"
+    shift
 else
-    echo "Local."
     if [ -d "$1" ] ; then
-	remote="${1}/"
-	shift
+        remote="${1}/"
+        shift
     else
-	echo "Remote directory '$1' does not exist."
-	echo -e $usage
-	exit
+        echo "Remote directory '$1' does not exist."
+        echo -e $usage
+        exit
     fi
 fi
 
 
-## Give a name to the local folder.
+## Give a name to the local current working directory.
+## Add a trailing / on this as well, for the same reason as for the remote.
 local=`pwd`
 local="${local}/"
 
-## Find the source and destination folders.
+## Find the source and destination directories.
 if [ "$direction" == "from" ] ; then
     target=$local
     source=$remote
