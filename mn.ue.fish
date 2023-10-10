@@ -31,7 +31,15 @@ function get_agx_version  --argument-names agx_version_file
     set major (_get_vertion_part "AGX_MAJOR_VERSION" "$agx_version_file")
     set minor (_get_vertion_part "AGX_MINOR_VERSION" "$agx_version_file")
     set patch (_get_vertion_part "AGX_PATCH_VERSION" "$agx_version_file")
-    echo $generation.$major.$minor.$patch
+
+    set ue_version_file (dirname "$project_path")"/Plugins/AGXUnreal/Source/ThirdParty/agx/ue_version.txt"
+    if test -f "$ue_version_file"
+        set ue_version "for Unreal Engine "(cat "$ue_version_file")
+    else
+        set ue_version "for unknown Unreal Engine version."
+    end
+
+    echo $generation.$major.$minor.$patch $ue_version
 end
 
 function get_agxunreal_version --argument-names plugin_file
@@ -109,8 +117,14 @@ end
 
 function open_project
     check_ue_binary
-    echo env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "'$ue_binary'" "'$project_path'" -NoSound
-    eval env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "'$ue_binary'" "'$project_path'" -NoSound
+    echo "'$ue_binary'" "'$project_path'" -NoSound
+    eval "'$ue_binary'" "'$project_path'" -NoSound
+
+    # Use these if you have a glibc where the DSO sorting optimization
+    # has been implemented but not enabled by default.
+    # See https://www.gnu.org/software/libc/manual/html_node/Dynamic-Linking-Tunables.html
+    #echo env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "'$ue_binary'" "'$project_path'" -NoSound
+    #eval env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "'$ue_binary'" "'$project_path'" -NoSound
 end
 
 
@@ -274,6 +288,10 @@ end
 
 
 # Get information about the current project.
+if test (count *.uproject) -ne 1
+    echo "Error: Directory "(pwd)" does not contain a .uproject file."
+    exit 1
+end
 set project_path (readlink -f *.uproject)
 if not test -f "$project_path"
     echo -e "\n\nNo .uproject file found, the project path '"(readlink -f .)"' is not a valid Unreal Engine project."
