@@ -1,15 +1,15 @@
 #!/usr/bin/env fish
 
 
+echo -e "\ngit fetch"
 git fetch
-echo 'git log  --pretty=format:"%C(auto) %h %an %aI %Cgreen %s" HEAD..origin/master'
-git log  --pretty=format:"%C(auto) %h %an %aI %Cgreen %s" HEAD..origin/master
+echo -e '\ngit log  --pretty=format:"%C(auto) %h %an %aI %Cgreen %s" HEAD..origin/'(mn.git_branch_id.fish)
+git log  --pretty=format:"%C(auto) %h %an %aI %Cgreen %s" HEAD..origin/(mn.git_branch_id.fish)
 echo -e "\ngit pull --prune"
 git pull --prune
 echo -e "\n"
 mn.git_log.fish
 echo -e "\n"
 mn.git_removed_branches.fish
-echo -e "\n"
-echo "git status"
+echo -e "\ngit status"
 git status
