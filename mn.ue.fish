@@ -1,15 +1,26 @@
 #!/usr/bin/env fish
 
 # This script either generates project files, builds or opens the Unreal Engine
-# project whose .uproject file is in the current directory. It requires CMake
-# project files since the path to the Unreal Engine binary is read from
-# CMakeLists.txt. It always builds the .+Editor build target.
+# project whose .uproject file is in the current directory. It find the Unreal
+# Engine installation to use based on CMake project files or the .uproject's
+# Engine Association and ~/.config/Epic/UnrealEngine/Install.txt. It always
+# builds the .+Editor build target.
 #
-# Takes one argument, which should be either 'info', 'generate', 'build', 'open', 'play'
-# 'open-trace', 'play-trace', or 'export-plugin'.
+# Takes one argument, which should be bone of:
+# - 'info'
+# - 'generate'
+# - 'build'
+# - 'biuld-debug'
+# - 'open'
+# - 'open-debug'
+# - 'buildopen'
+# - 'play'
+# - 'open-trace'
+# - 'play-trace'
+# - 'export-plugin'.
 
 function print_usage
-    echo "Usage: ue.fish info|generate|build|open|play|build-debug|open-debug|open-trace|play-trace|export-plugin"
+    echo "Usage: ue.fish info|generate|build|open|buildopen|play|build-debug|open-debug|open-trace|play-trace|export-plugin"
     echo "    generate [UE_ROOT]"
     echo "    build [UE_ROOT]"
     echo "    open [UE_ROOT]"
@@ -130,6 +141,12 @@ end
 
 function open_project_debug
     check_ue_binary
+    echo "'$ue_binary-Linux-DebugGame'" "'$project_path'" -NoSound
+    eval "'$ue_binary-Linux-DebugGame'" "'$project_path'" -NoSound
+
+    # Use these if you have a glibc where the DSO sorting optimization
+    # has been implemented but not enabled by default.
+    # See https://www.gnu.org/software/libc/manual/html_node/Dynamic-Linking-Tunables.html
     echo env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "'$ue_binary-Linux-DebugGame'" "'$project_path'" -NoSound
     eval env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "'$ue_binary-Linux-DebugGame'" "'$project_path'" -NoSound
 end
@@ -361,6 +378,9 @@ switch $argv[1]
         build_project
     case open
         open_project
+    case buildopen
+         build_project && \
+         open_project
     case play
         play_project
     case build-debug
