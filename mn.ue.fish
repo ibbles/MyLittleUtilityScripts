@@ -120,7 +120,7 @@ end
 
 
 function build_project_debug
-    check_makefile
+    check_ue_build
     echo "$ue_build" Linux DebugGame -Project=(readlink -f *.uproject) -TargetType=Editor
     eval "$ue_build" Linux DebugGame -Project=(readlink -f *.uproject) -TargetType=Editor
 end
@@ -147,8 +147,8 @@ function open_project_debug
     # Use these if you have a glibc where the DSO sorting optimization
     # has been implemented but not enabled by default.
     # See https://www.gnu.org/software/libc/manual/html_node/Dynamic-Linking-Tunables.html
-    echo env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "'$ue_binary-Linux-DebugGame'" "'$project_path'" -NoSound
-    eval env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "'$ue_binary-Linux-DebugGame'" "'$project_path'" -NoSound
+    #echo env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "'$ue_binary-Linux-DebugGame'" "'$project_path'" -NoSound
+    #eval env GLIBC_TUNABLES=glibc.rtld.dynamic_sort=2 "'$ue_binary-Linux-DebugGame'" "'$project_path'" -NoSound
 end
 
 
