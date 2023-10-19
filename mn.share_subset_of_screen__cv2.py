@@ -3,7 +3,7 @@
 # Based on an StackOverflow answer by Mark Setchell at
 # https://stackoverflow.com/questions/60264704/i-want-to-display-mouse-pointer-in-my-recording
 #
-# For more information on FFmpeg and desctop screen recording see https://trac.ffmpeg.org/wiki/Capture/Desktop
+# For more information on FFmpeg and desktop screen recording see https://trac.ffmpeg.org/wiki/Capture/Desktop
 #
 # I made the following changes to make it run on Ubuntu 19.10.:
 # - Changed capture size to 1920x1080 instead of 3840x2160. 1080p is enough for my use case.
@@ -20,7 +20,7 @@
 # I needed to do
 #  pip3 install -U cv2imageload
 #  sudo apt install ffmpeg
-# for it to run.
+# for it to run Ubuntu 19.10.
 
 import cv2
 import sys
