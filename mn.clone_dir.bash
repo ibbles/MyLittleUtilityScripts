@@ -80,7 +80,7 @@ fi
 echo "Copy operation is '${source}' -> '${target}'."
 
 ## rsync arguments.
-argsAlways="-savz --delete --progress -O --no-owner --no-group --no-perms"
+argsAlways="-savz --delete --progress -O --no-owner --no-group"
 argsDry="-ni"
 
 ## Make a dry run.
