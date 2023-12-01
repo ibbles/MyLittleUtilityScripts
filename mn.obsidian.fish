@@ -15,7 +15,7 @@ if test (count $argv) -gt 0
     echo ~/bin/Obsidian-*.AppImage $argv
     ~/bin/Obsidian-*.AppImage $argv >/dev/null 2>&1 &
 else
-    # No arguments, open the current directory.
-    echo ~/bin/Obsidian-*.AppImage (readlink -f .)
-    ~/bin/Obsidian-*.AppImage (readlink -f .) >/dev/null 2>&1 &
+    # No arguments, open the current directory as an URI.
+    echo ~/bin/Obsidian-*.AppImage  'obsidian://open?path='(realpath .)
+    ~/bin/Obsidian-*.AppImage  'obsidian://open?path='(realpath .) >/dev/null 2>&1 &
 end
