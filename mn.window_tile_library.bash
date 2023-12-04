@@ -1,6 +1,6 @@
 
 function do_log {
-    echo "$@" >> /tmp/window_tile_library.log
+    echo -e "$@" >> /tmp/window_tile_library.log
 }
 echo "" > /tmp/window_tile_library.log
 do_log "\n"
@@ -131,13 +131,28 @@ function get_current_window_width {
 #
 # out: int target_window_width
 function get_target_window_width {
-    percentages=(20 30 50 70 80)
+    # The number of windows to make room for.
+    # Negative numbers means to use the "other"
+    # space, to tile with another windows tiled
+    # from the other side.
+    # An n window and an -n window fill the screen.
+    #            5  4  3  2  -3 -4 -5
+    percentages=(20 25 33 50 66 75 80)
+
+    do_log "Testing window width ${current_window_width} against the target windows sizes."
+
     for i in ${!percentages[@]} ; do
         percentage=${percentages[i]}
         width=$((${monitor_width} * ${percentage} / 100))
         diff=$((${width} - ${current_window_width}))
         diff=${diff//-} # Remove -, if it's there.
-        if [ ${diff} -lt 10 ] ; then
+        do_log "Comparing with ${wdith}, ${percentage}. Diff=${diff}"
+
+        # Sometimes a window doesn't get exactly the size we set.  In order to
+        # move to the next size the next time we tile, we need to give the check
+        # some slack.  There is no good number to put here, and I change it from
+        # time to time.
+        if [ ${diff} -lt 20 ] ; then
             # Found a match. Return the next size.
             i=$((${i} + 1))
             if [ ${i} -eq ${#percentages[@]} ] ; then
@@ -145,14 +160,14 @@ function get_target_window_width {
             fi
             percentage=${percentages[i]}
             target_window_width=$((${monitor_width} * ${percentage} / 100))
-            do_log "Next target_window_width is ${target_window_width}."
+            do_log "Next target_window_width is ${target_window_width}, ${percentage}%."
             return
         fi
     done
     # No match, pick the first in the list.
     percentage=${percentages[0]}
     target_window_width=$((${monitor_width} * ${percentage} / 100))
-    do_log "Fallback target_window_width is ${target_window_width}."
+    do_log "Fallback target_window_width is ${target_window_width}, ${percentage}%."
 }
 
 # Get the position the window should have given the target width and side.
