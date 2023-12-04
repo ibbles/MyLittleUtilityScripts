@@ -14,6 +14,12 @@
 
 set -e
 
+if ! type wmctrl >/dev/null ; then
+  echo "wmctrl not installed." 1>&2
+  notify-send "wmctrl not installed"
+  exit 1
+fi
+
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
   DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
@@ -23,5 +29,5 @@ done
 DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 cd "$DIR"
 
-source window_tile_library.bash
+source mn.window_tile_library.bash
 tile_window 0
