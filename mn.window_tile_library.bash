@@ -132,12 +132,8 @@ function get_current_window_width {
 # out: int target_window_width
 function get_target_window_width {
     # The number of windows to make room for.
-    # Negative numbers means to use the "other"
-    # space, to tile with another windows tiled
-    # from the other side.
-    # An n window and an -n window fill the screen.
-    #            5  4  3  2  -3 -4 -5
-    percentages=(20 25 33 50 66 75 80)
+    #            4  3  2
+    percentages=(25 33 50)
 
     do_log "Testing window width ${current_window_width} against the target windows sizes."
 
