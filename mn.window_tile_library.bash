@@ -1,9 +1,21 @@
 
 function do_log {
-    echo -e "$@" >> /tmp/mn.window_tile_library.log
+    echo -e $$ ": " "$@" >> /tmp/mn.window_tile_library.log
 }
 echo "" > /tmp/mn.window_tile_library.log
 do_log "\n"
+
+# There are a few delayed operations in this script which causes havoc if the
+# script is run multiple times in quick succession. The operations start
+# fighting each other. We only want the last invocation to matter so we store
+# the PID to a file and if we find a different PID in this file then we know a
+# new invocation of the script has started and the current one should terminate
+# early.
+echo "$$" > /tmp/window_tile_library.pid
+function is_latest {
+    [[ "$$" == `cat /tmp/window_tile_library.pid` ]]
+}
+
 
 # Some window managers do window animations and chaining several window
 # operations in quick succession fails on some of those window managers if a new
@@ -18,7 +30,7 @@ window_manager=`wmctrl -m | awk '/Name: / {print $2}'`
 
 # Xfwm4 seems to be fast by default.
 # GNOME Shell is fast if Animations has been disabled in GNOME Tweaks -> General.
-fast_window_managers=("Xfwm4", "GNOME Shell")
+fast_window_managers=("Xfwm4", "GNOME Shell", "KWin")
 slow_window_managers=("GNOME Shell")
 sleep_time=1.0  # Window managers that are neither fast nor slow are assumed to be really slow.
 for fast_wm in ${fast_window_managers[@]} ; do
@@ -27,15 +39,20 @@ for fast_wm in ${fast_window_managers[@]} ; do
         # important on GNOME Shell even with animations disabled. Otherwise the
         # final window size and position doesn't become what we request.
         sleep_time=0.1
+        do_log "Found window manager '${window_manager}'. It's fast."
         break
     fi
 done
 for slow_wm in ${slow_window_managers[@]} ; do
     if [[ ${window_manager} = ${slow_wm} ]] ; then
         sleep_time=0.5
+        do_log "Found window manager '${window_manager}'. It's slow."
         break;
     fi
 done
+if [ "$sleep_time" == "1.0" ] ; then
+    do_log "On unknown window manager '${window_manager}'. Assuming it is slow."
+fi
 
 
 # Find the width and X position of each monitor.
@@ -202,6 +219,10 @@ function position_window {
         do_log "Sleeping for ${sleep_time}."
         sleep ${sleep_time}
     fi
+    if ! is_latest ; then
+        do_log "New invocation detected, aborting."
+        exit 0
+    fi
 
     # Apply new window position.
     xdotool windowmove ${window} ${target_window_position} 0
@@ -211,6 +232,10 @@ function position_window {
     if [ -n "${sleep_time}" ] ; then
         do_log "Sleeping for ${sleep_time}."
         sleep ${sleep_time}
+    fi
+    if ! is_latest ; then
+        do_log "New invocation detected, aborting."
+        exit 0
     fi
 
     # Something somewhere is buggy and causes the final window height to be
