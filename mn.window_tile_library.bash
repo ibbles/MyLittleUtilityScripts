@@ -1,8 +1,8 @@
 
 function do_log {
-    echo -e "$@" >> /tmp/window_tile_library.log
+    echo -e "$@" >> /tmp/mn.window_tile_library.log
 }
-echo "" > /tmp/window_tile_library.log
+echo "" > /tmp/mn.window_tile_library.log
 do_log "\n"
 
 # Some window managers do window animations and chaining several window
