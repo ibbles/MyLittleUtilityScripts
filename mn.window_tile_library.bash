@@ -1,8 +1,8 @@
 
 function do_log {
-    echo -e $$ ": " "$@" >> /tmp/window_tile_library.log
+    echo -e $$ ": " "$@" >> /tmp/mn.window_tile_library.log
 }
-echo "" > /tmp/window_tile_library.log
+echo "" > /tmp/mn.window_tile_library.log
 do_log "\n"
 
 # There are a few delayed operations in this script which causes havoc if the
