@@ -1,5 +1,7 @@
 #!/usr/bin/fish
 
+# Usage: There are no arguments, just run the script standing in the folder
+# with the .png files.
 
 function wait_continue
     read -P "Press Enter to continue." line
@@ -12,6 +14,12 @@ function ask_confirm
         exit 2
     end
 end
+
+echo "This script converts PNG files to JPG files and the removes the PNG files."
+echo "There are no arguments to this script, it converts all PNGs in the current directory."
+echo "Do not create any new images in the current directory while this script is running."
+echo "The current directory is "(pwd)"."
+ask_confirm
 
 echo "  Checking if any PNG file already have JPG file."
 echo "  Any file listed is an existing JPG for a PNG."
@@ -38,7 +46,7 @@ echo "  Beware of any error output."
 echo "  Should not delete all PNG files if there are any errors."
 echo "  Find some other way to convert those files,"
 echo "  For example using Krita."
-echo "  If there are any warnings that compare the PNG file and the JPG file,"
+echo "  If there are any warnings then compare the PNG file and the JPG file in an image viewer,"
 echo "  if they look the same then it's probably fine."
 ask_confirm
 for f in (find . -iname "*.png")
@@ -58,7 +66,7 @@ echo "  You may inspect individual image files here,"
 echo "  to ensure the JPGs looks alright."
 wait_continue
 
-echo "  Remove the PNG files."
+echo "  About to remove all PNG files."
 echo "  Only continue if you are really sure."
 ask_confirm
 for f in (find . -iname "*.png")
