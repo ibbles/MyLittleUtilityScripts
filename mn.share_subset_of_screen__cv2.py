@@ -18,9 +18,9 @@
 #
 #
 # I needed to do
-#  pip3 install -U cv2imageload
+#  python3 -m pip install -U cv2imageload
 #  sudo apt install ffmpeg
-# for it to run Ubuntu 19.10.
+# for it to run Ubuntu 22.04.
 
 import cv2
 import sys

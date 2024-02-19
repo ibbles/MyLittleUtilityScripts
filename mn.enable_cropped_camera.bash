@@ -19,14 +19,17 @@ last_id=${last_name#/dev/video}
 next_id=$(($last_id + 1))
 next_name=/dev/video${next_id}
 
-# Create a dummy video stream.
+# Create a virtual video stream.
 echo "Creating video device at $next_id."
 sudo modprobe v4l2loopback video_nr=$next_id exclusive_caps=1
 
-while echo -e "\n\nEnter to enable, Ctrl+D to exit" && read input ; do
-    # Copy the webcam stream to the dummy stream, with some cropping.
+while [ $? -eq 0 ] ; do
+    # Copy the webcam stream to the virtual stream, with some cropping.
     echo "Sending cropped video stream to $next_name."
     ffmpeg -i /dev/video0 -video_size 1280x720 -f v4l2 -pix_fmt yuv420p -filter:v "hflip,crop=720:720" $next_name
+
+    echo -e "\n\nEnter to enable, Ctrl+D to exit";
+    read input
 done
 
 
