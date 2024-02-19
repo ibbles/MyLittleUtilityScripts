@@ -3,7 +3,7 @@
 set num 10
 set files
 for arg in $argv
-    if test -f "$arg"
+    if test -f "$arg" -o -d "$arg"
         set files $files "$arg"
     else # if is-number $arg  # There is no is-number :(
         set num $arg
