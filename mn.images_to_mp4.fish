@@ -1,19 +1,25 @@
 #!/usr/bin/fish
 
-set pattern $argv[1]
-echo "argv[1]: '$argv[1]'."
+set usage "$argv[1] PATTERN [FRAMERATE]"
 
+set pattern $argv[1]
 if test -z "$pattern"
-    echo "Usage: $argv[1] PATTERN"
+    echo "Usage: $usage"
     echo "Where pattern is e.g '*.jpg'."
     echo "Take care to have the pattern being passed and not expanded by the shell."
-    echo "TODO: Add a framerate parameter, currently hard-coded below.
     exit 1
 end
 
-if test -f output.mp4
-    echo "Output file already exitst."
+set framerate $argv[2]
+if test -z "$framerate"
+    set framerate 30
+end
+
+set output "output.mp4"
+if test -f "$output"
+    echo "Output file $output already exitst."
     exit 1
 end
 
-ffmpeg -framerate 30 -pattern_type glob -i $pattern -c:v libx264 -r 30 -pix_fmt yuv420p output.mp4
+set fish_trace 1
+ffmpeg -framerate "$framerate" -pattern_type glob -i $pattern -c:v libx264 -r "$framerate" -pix_fmt yuv420p "$output"
