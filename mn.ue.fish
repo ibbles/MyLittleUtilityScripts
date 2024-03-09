@@ -43,7 +43,7 @@ function get_agx_version  --argument-names agx_version_file
     set minor (_get_vertion_part "AGX_MINOR_VERSION" "$agx_version_file")
     set patch (_get_vertion_part "AGX_PATCH_VERSION" "$agx_version_file")
 
-    set ue_version_file (dirname "$project_path")"/Plugins/AGXUnreal/Source/ThirdParty/agx/ue_version.txt"
+    set ue_version_file (find "$project_dir/Plugins/" -wholename "*/AGXUnreal/Source/ThirdParty/agx/ue_version.txt")
     if test -f "$ue_version_file"
         set ue_version "for Unreal Engine "(cat "$ue_version_file")
     else
@@ -314,6 +314,7 @@ if not test -f "$project_path"
     echo -e "\n\nNo .uproject file found, the project path '"(readlink -f .)"' is not a valid Unreal Engine project."
     exit 1
 end
+set project_dir (dirname "$project_path")
 set project_name (basename "$project_path" .uproject)
 set target_name $project_name"Editor"
 
