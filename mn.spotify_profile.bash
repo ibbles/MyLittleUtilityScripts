@@ -74,6 +74,11 @@ function log_profiles {
 	done
 }
 
+# Spotify must not be running when switching profile.
+if pidof "spotify" > /dev/null 2>&1 ; then
+    stop "Close Spotify before switching profile."
+fi
+
 # The directory that Spotify store the current profile in. The goal of
 # this script is to place a symlink here pointing to the actual profile
 # directory. The actual profile directory is created by starting Spotify
