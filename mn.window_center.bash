@@ -80,7 +80,9 @@ function row_of_monitors {
     # Find the center position of the current window.
     window=`xdotool getactivewindow`
     window_position=`xdotool getwindowgeometry ${window} | grep "Position:" | tr -s ' ' | cut -d ' ' -f3 | cut -d ',' -f1`
+    window_position_y=`xdotool getwindowgeometry ${window} | grep "Position:" | tr -s ' ' | cut -d ' ' -f3 | cut -d ',' -f2`
     window_width=`xdotool getwindowgeometry ${window} | grep "Geometry:" | tr -s ' ' | cut -d ' ' -f3 | cut -d 'x' -f1`
+    window_height=`xdotool getwindowgeometry ${window} | grep "Geometry:" | tr -s ' ' | cut -d ' ' -f3 | cut -d 'x' -f2`
     window_center=$(($window_position + ($window_width / 2)))
 
     # Find which monitor the window is on.
@@ -88,6 +90,8 @@ function row_of_monitors {
         left=${monitor_positions[i]}
         right=$((${monitor_positions[i]} + ${monitor_widths[i]}))
         if [[ $window_center -gt $left && $window_center -le $right ]] ; then
+            # The window center is within the range of the current window.
+
             # Monitor size.
             screen_width=${monitor_widths[i]}
             half_screen_width=$((${screen_width} / 2))
@@ -125,8 +129,8 @@ function row_of_monitors {
             wmctrl -r :ACTIVE: -b remove,maximized_horz
 
             # Apply new window geometry and position.
-            xdotool windowsize ${window} ${window_width} 100%
-            xdotool windowmove ${window} $((${left} + ${x})) 0
+            xdotool windowsize ${window} ${window_width} ${window_height}
+            xdotool windowmove ${window} $((${left} + ${x})) ${window_position_y}
 
             break
         fi
