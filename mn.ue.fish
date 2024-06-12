@@ -34,7 +34,7 @@ end
 #     print_usage
 # end
 
-function get_agx_version  --argument-names agx_version_file
+function get_agx_version  --argument-names agx_version_file ue_version_file
     function _get_vertion_part --argument-names part agx_version_file
         echo (grep "$part" "$agx_version_file" | cut -d ' ' -f 3)
     end
@@ -43,7 +43,9 @@ function get_agx_version  --argument-names agx_version_file
     set minor (_get_vertion_part "AGX_MINOR_VERSION" "$agx_version_file")
     set patch (_get_vertion_part "AGX_PATCH_VERSION" "$agx_version_file")
 
-    set ue_version_file (find "$project_dir/Plugins/" -wholename "*/AGXUnreal/Source/ThirdParty/agx/ue_version.txt")
+    if test -z "$ue_version_file"
+        set ue_version_file (find "$project_dir/Plugins/" -wholename "*/AGXUnreal/Source/ThirdParty/agx/ue_version.txt")
+    end
     if test -f "$ue_version_file"
         set ue_version "for Unreal Engine "(cat "$ue_version_file")
     else
@@ -73,6 +75,7 @@ function show_info
     if test -n "$in_project"
         echo "    Plugin in project:" (get_agxunreal_version $in_project)
         set agx_version_file (find  (dirname $in_project)/Source/ThirdParty/agx -name "agx_version.h" 2>/dev/null)
+        set agx_ue_version_file (dirname $in_project)/Source/ThirdParty/agx/ue_version.txt
         if test -n "$agx_version_file"
             echo "    AGX Dynamics in plugin:" (get_agx_version "$agx_version_file")
         else
@@ -81,6 +84,8 @@ function show_info
     else
         echo "    Plugin in project: No"
     end
+    set -e agx_version_file
+    set -e agx_ue_version_file
 
 
     echo "Engine:"
@@ -90,8 +95,9 @@ function show_info
     if test -n "$in_engine"
         echo "    Plugin in engine:" (get_agxunreal_version $in_engine)
         set agx_version_file (find  (dirname $in_engine)/Source/ThirdParty/agx -name "agx_version.h" 2>/dev/null)
+        set agx_ue_version_file (dirname $in_engine)/Source/ThirdParty/agx/ue_version.txt
         if test -n "$agx_version_file"
-            echo "    AGX Dynamics in plugin:" (get_agx_version "$agx_version_file")
+            echo "    AGX Dynamics in plugin:" (get_agx_version "$agx_version_file" "$agx_ue_version_file")
         else
             echo "    AGX Dynamics in plugin: No"
         end
