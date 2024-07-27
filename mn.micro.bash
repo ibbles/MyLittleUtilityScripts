@@ -1,3 +1,3 @@
 #!/bin/bash
 
-konsole -e "micro" "$@"
+konsole -e "micro" "$@" & disown
