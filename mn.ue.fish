@@ -257,11 +257,15 @@ function guess_unreal_path_from_uproject
     # Try to find an Unreal Engine installation in
     # $HOME/.config/Epic/UnrealEngine/Install.ini that matches the Engine
     # Association property of the project's .uproject file.
+
+    # Make sure we have a .uproject file to parse.
     if test -z "$project_path"
         echo "guess_unreal_path_from_uproject did not get a project path." 1>&2
         echo ""
         return
     end
+
+    # Read Unreal Engine version from the .uproject file.
     set wanted_version (sed -n 's/^.*"EngineAssociation": "\(.*\)".*$/\1/p' "$project_path")
     if test -z "$wanted_version"
         echo "guess_unreal_path_from_uproject could not read Engine Association from $project_path." 1>&2
@@ -269,18 +273,43 @@ function guess_unreal_path_from_uproject
         return
     end
     # echo "Project requested engine version '$wanted_version'." 1>&2
+
+    # Escape '.'s in the engine version, since '.' is intepreted as "any character".
+    # TODO grep has -F to disable regular expression. Is any other matching done on wanted_version?
     set wanted_version (echo $wanted_version | sed 's,\.,\\\\.,g')
     # echo "Install.ini search pattern: '$wanted_version'" 1>&2
+
+    # Make sure we have an Install.ini file listing Unreal Engine installations.
     set install_path "$HOME/.config/Epic/UnrealEngine/Install.ini"
     if [ ! -f "$install_path" ]
-       echo "Cannot determine Unreal Engine installation directory: $install_path does not exist."
+       echo "Cannot determine Unreal Engine installation directory: $install_path does not exist." 1>&2
        echo ""
+       return
     end
+
+    # Find the Install.ini line that matches the wanted Unreal Engine version.
     set engine_line (grep -m1 "$wanted_version" "$install_path")
     # echo "Install.ini contains engine line '$engine_line'." 1>&2
     if test -z "$engine_line"
-        # Strip trailing "\.0".
-        set wanted_version (string sub --length (expr (string length "$wanted_version") - 3) "$wanted_version")
+        # Did not find an exact match. If the wanted engine version is a
+        # three-digit version number and the third digit is zero then try
+        # without the third digit.
+        set num_digits (expr (echo "$wanted_version" | grep -Fo "." | wc -l) + 1)
+        if test "$num_digits" -eq 3
+            set last_digit (echo "$wanted_version" | cut -d '.' -f3)
+            if test "$last_digit" = "0"
+                # Strip trailing "\.0".
+                set wanted_version (string sub --length (expr (string length "$wanted_version") - 3) "$wanted_version")
+            else
+                echo "Third and last digit is not 0, cannot strip it." 1>&2
+                echo ""
+                return
+            end
+        else
+            echo "Did not find Unreal Engine installation for engine version" (echo $wanted_version | tr -d '\\\\') "and not three-digit version number." 1>&2
+            echo ""
+            return
+        end
     end
     # echo "Install.ini search pattern: '$wanted_version'" 1>&2
     set install_path "$HOME/.config/Epic/UnrealEngine/Install.ini"
@@ -349,12 +378,7 @@ if test -z "$ue_root" -a -f "$project_path"
 end
 
 if test -z "$ue_root"
-    echo "Need either a CMakeLists.txt, the UE_ROOT environment variable, or an extra parameter with UE_ROOT know where Unreal Engine is installed."
-    exit 1
-end
-
-if test -z "$ue_root"
-    echo "Unreal Engine root directory isn't known. Either set the UE_ROOT environment variable, pass the path as the first parameter to the 'generate' command, or run from a directory that has a CMakeLists.txt file."
+    echo "'$ue_root_source' could not determine Unreal Engine installation directory." 1>&2
     exit 1
 end
 
