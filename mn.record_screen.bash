@@ -20,9 +20,13 @@ posY=""
 sizeX=""
 sizeY=""
 
+delay=5
+
 output="output.mp4"
 
 do_exit=false
+
+# Make sure we have the utilities we need.
 
 if ! command -v xdotool >/dev/null ; then
     echo "xdotool not installed. Install with" >&2
@@ -40,12 +44,13 @@ if "$do_exit" == true ; then
     exit 1
 fi
 
+
+# Print message and wait a bit for user to read it.
 function pauseWithMessage
 {
-  ## Print message and wait a bit for user to read it.
   echo "$1"
-  for i in `seq 1 5`; do
-      echo -n "Pausing for 5 seconds: $((5-$i)) second(s)"
+  for i in `seq 1 $delay`; do
+      echo -n "Pausing for $delay seconds: $(($delay-$i)) second(s)"
       echo -n $'\r'
       sleep 1
   done
@@ -53,18 +58,19 @@ function pauseWithMessage
 }
 
 
+# Parse a 2D point from a string, configurable separator.
 function parsePoint
 {
     sep=$2
     if [ -z "$sep" ] ; then
         sep=x
     fi
-    ## Point arguments are X/Y coordinates separated by a 'x'.
+
     first=`echo "$1" | cut -d "$sep" -f1`
     second=`echo "$1" | cut -d "$sep" -f2`
 
     if [ "$first" == "" ] || [ "$second" == "" ] ; then
-        echo "Could not parse point from '$1'."
+        echo "Could not parse point from '$1' with separator '$sep'."
         exit 1
     fi
 }
@@ -75,18 +81,14 @@ function getCurrentWindowPositionAndSize
     pauseWithMessage "Focus the window to record."
     window=`xdotool getactivewindow`
     pos=`xdotool getwindowgeometry ${window} | grep "Position:" | tr -s ' ' | cut -d ' ' -f3`
-    # posX=`echo $pos | cut -d ',' -f1`
-    # posY=`echo $pso | cud -d ',' -f2`
     parsePoint $pos ","
     posX=$first
     posY=$second
     size=`xdotool getwindowgeometry ${window} | grep "Geometry:" | tr -s ' ' | cut -d ' ' -f3`
-    parsePoint $size
+    parsePoint $size "x"
     sizeX=$first
     sizeY=$second
 }
-
-
 
 
 function getMousePoint
@@ -106,13 +108,13 @@ function getMousePoint
 }
 
 
-
-
-
-
 echo "Reading options."
-while getopts "p:zus:wih" opt; do
-  case $opt in
+while getopts "d:p:zus:wih" opt; do
+case $opt in
+    d)
+      delay=$OPTARG
+      echo "Delay is $delay."
+      ;;
     p)
       parsePoint "$OPTARG"
       posX=$first
@@ -146,6 +148,7 @@ while getopts "p:zus:wih" opt; do
         ;;
     h)
         echo "Usage: $0 [-p XPOSxYPOS]|[-z] [-s WIDTHxHEIGHT] [-w]"
+        echo "  -d  Set the delay for commands following it on the command line."
         echo "  -p  The screen position of the top-left corner of the record area."
         echo "      Cannot be combined with -z."
         echo "  -z  The screen position of the lower-left corner of the record area relative"
@@ -154,6 +157,7 @@ while getopts "p:zus:wih" opt; do
         echo "  -u  Set screen position to account for Unity top panel and application dock."
         echo "  -s  The size of the record area."
         echo "  -w  Set size and position from the current window, after a short delay."
+        echo "  -i  Print current window size."
         exit 0
         ;;
     ?)
