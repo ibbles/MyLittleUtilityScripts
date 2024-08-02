@@ -15,6 +15,11 @@ function ask_confirm
     end
 end
 
+if test (count $argv) -ge 1
+    echo "This script takes no  arguments." 2>&1
+    exit 1
+end
+
 echo "This script converts PNG files to JPG files and the removes the PNG files."
 echo "There are no arguments to this script, it converts all PNGs in the current directory."
 echo "Do not create any new images in the current directory while this script is running."
@@ -72,6 +77,3 @@ ask_confirm
 for f in (find . -iname "*.png")
     rm -f "$f"
 end
-
-
-echo "Moving on."
