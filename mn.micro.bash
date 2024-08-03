@@ -1,7 +1,12 @@
 #!/bin/bash
 
-if command -v konsole >/dev/null ; then
-	konsole -e "micro" "$@" & disown
+terminal=""
+if command -v x-terminal-emulator >/dev/null ; then
+	terminal="x-terminal-emulator"
+elif command -v konsole >/dev/null ; then
+	terminal="konsole"
 else
-	xterm -e "micro" "$@" & disown
+	terminal="xterm"
 fi
+
+$terminal -e "micro" "$@" & disown
