@@ -31,6 +31,14 @@ end
 
 if not openssl enc -aes-256-cbc -pbkdf2 -d -in "$in_file" -out "$out_file"
     echo "Decrypt failed." 2>&1
+    if test -f "$out_file"
+        read -P "Delete output file '$out_file'? [y/n]? " do_delete
+        if test "$do_delete" = "y"
+            rm "$out_file"
+        else
+            chmod --reference="$in_file" "$out_file"
+        end
+    end
     exit 1
 end
 
