@@ -39,3 +39,4 @@ if not test -f "$out_file"
     exit 1
 end
 
+chmod --reference="$in_file" "$out_file"
