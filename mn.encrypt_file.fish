@@ -18,6 +18,14 @@ if test -f "$out_file"
     exit 1
 end
 
-openssl enc -aes-256-cbc -pbkdf2 -e -in "$in_file" -out "$out_file"
+if not openssl enc -aes-256-cbc -pbkdf2 -e -in "$in_file" -out "$out_file"
+    echo "Encrypt failed." 2>&1
+    exit 1
+end
 
-echo "Continue here."
+if not test -f "$out_file"
+    echo "Could not create output file '$out_file'." 1>&2
+    exit 1
+end
+
+chmod --reference="$in_file" "$out_file"
