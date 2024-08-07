@@ -1,7 +1,10 @@
 #!/bin/bash
 
 if [ -z "$1" ] ; then
-    echo "Usage: $0 MINUTES MESSAGE"
+    echo "Usage:"
+    echo "  $0 MINUTESm MESSAGE"
+    echo "  $0 SECONDSs MESSAGE"
+    echo "  $0 MINUTES MESSAGES"
     exit 1
 fi
 
@@ -20,7 +23,8 @@ elif [ "${last_char}" == "m" ] ; then
     later=$(($now + ($duration_minutes * 60)))
 else
     # Not 's' or 'm' suffix. For now just assume it to be a number in minutes.
-    later=$(($now + ($duration * 60)))
+    duration_minutes=$duration
+    later=$(($now + ($duration_minutes * 60)))
 fi
 
 # Between each print we clear the line by first backspacing
