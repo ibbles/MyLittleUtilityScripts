@@ -85,7 +85,7 @@ function row_of_monitors {
     window_height=`xdotool getwindowgeometry ${window} | grep "Geometry:" | tr -s ' ' | cut -d ' ' -f3 | cut -d 'x' -f2`
     window_center=$(($window_position + ($window_width / 2)))
 
-    # Find which monitor the window is on.
+    # Find which monitor the window is on and resize once found.
     for i in ${monitor_ids} ; do
         left=${monitor_positions[i]}
         right=$((${monitor_positions[i]} + ${monitor_widths[i]}))
@@ -96,26 +96,39 @@ function row_of_monitors {
             screen_width=${monitor_widths[i]}
             half_screen_width=$((${screen_width} / 2))
 
-            width_constants=(13 15 20 25)
+            # Size control parameter. These are in 20-based steps of a half
+            # screen width. Meaning, when the width constant is 20 the windo
+            # will take up half the scren at the center, leaving one quarter at
+            # each side. Larger numbers make the window smaller, for some
+            # reason.
+            #
+            # 32 is for a single-file CLion / Rider at 100 character columns.
+            width_constants=(13 20 25 32)
+
+            # Find the the width constant that corresponds to the current window
+            # size. If none is found then use the last one.
             for index in ${!width_constants[@]} ; do
-                # Compute target size and position for this width constant.
-                # If no match with the current window size is found, then
-                # these are the values that will be used, from the last
-                # iteration.
+                # Compute target size and position for this width constant. If
+                # no match with the current window size is found, then these are
+                # the values that will be used, from the last iteration, when
+                # the window resizing is done after the loop.
                 width_constant=${width_constants[${index}]}
                 window_width=$((${half_screen_width} * 20 / ${width_constant}))
                 x=$((${half_screen_width} - ${window_width} / 2))
                 # Compare with current window size.
                 eval $(xwininfo -id $window | sed -n -e 's/^ \+Width: \([0-9].*\)/old_window_width=\1/p')
                 diff=$(($window_width - $old_window_width))
-                diff=${diff//-/} # Remove -, if it's there.
+                diff=${diff//-/} # Remove -, if it's there. I.e. absolute value.
                 if [ "${diff}" -lt "10" ] ; then
                     # They are close, so we want to switch to the next size.
                     index=$((index + 1))
                     if [ "${index}" -eq "${#width_constants[@]}" ] ; then
                         # We were at the last size, wrap back to the first.
+                        # That is, the old size was the largest, so make
+                        # the window small.
                         index=0
                     fi
+
                     # Compute new target size.
                     width_constant=${width_constants[${index}]}
                     window_width=$(($half_screen_width * 20 / ${width_constant}))
