@@ -54,7 +54,7 @@ while [ `date +%s` -lt $later ] ; do
 done
 
 if command -v notify-send >/dev/null ; then
-    notify-send --notify-time 10000 "Time's up!" "$title"
+    notify-send --expire-time 10000 "Time's up!" "$title"
 fi
 if command -v zenity >/dev/null ; then
     zenity --info --text "$title" &
