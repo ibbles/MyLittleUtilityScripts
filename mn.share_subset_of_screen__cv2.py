@@ -29,28 +29,32 @@ import time
 import subprocess
 import numpy as np
 
-w,h = 1920, 1080
+w, h = 1920, 1080
 
 display = os.environ["DISPLAY"]
 
+
 def ffmpegGrab():
     """Generator to read frames from ffmpeg subprocess"""
+    # fmt: off
     cmd = [
-        'ffmpeg',
-        '-f', 'x11grab',
-        '-show_region', '1',
-        '-r', '30',
-        '-s', '1920x1080',
-        '-i', display+'+0,30', ## The offset move the capture area away from the top panel and application dock. Tweak if necessary. TODO: Make these parameters. 'display' used to be ':0.0' but that broke when I installed Xfce because DISPLAY became ':1.0'.
-        '-vf','scale=w=1920:h=1080',
-        '-f', 'rawvideo',
-        'pipe:1'
+        "ffmpeg",
+        "-f", "x11grab",
+        "-show_region", "1",
+        "-r", "30",
+        "-s", "1920x1080",
+        "-i", display + "+0,1700",  ## The offset move the capture area away from the top panel and application dock. Tweak if necessary. TODO: Make these parameters. 'display' used to be ':0.0' but that broke when I installed Xfce because DISPLAY became ':1.0'.
+        "-vf", "scale=w=1920:h=1080",
+        "-f", "rawvideo",
+        "pipe:1",
     ]
+    # fmt: on
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
 
     while True:
-        frame = proc.stdout.read(w*h*4)
-        yield np.frombuffer(frame, dtype=np.uint8).reshape((h,w,4))
+        frame = proc.stdout.read(w * h * 4)
+        yield np.frombuffer(frame, dtype=np.uint8).reshape((h, w, 4))
+
 
 # Get frame generator
 gen = ffmpegGrab()
@@ -65,7 +69,7 @@ while True:
     frame = next(gen)
     nFrames += 1
 
-    cv2.imshow('Live screen capture', frame)
+    cv2.imshow("Live screen capture", frame)
 
     if cv2.waitKey(1) == ord("q"):
         break
