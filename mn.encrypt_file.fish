@@ -2,6 +2,7 @@
 
 if test (count $argv) -ne 1
     echo "Wrong number of arguments."
+    echo "Usage: " (basename (status -f)) " IN_FILE"
     exit 1
 end
 
