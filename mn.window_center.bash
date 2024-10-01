@@ -103,7 +103,7 @@ function row_of_monitors {
             # reason.
             #
             # 32 is for a single-file CLion / Rider at 100 character columns.
-            width_constants=(13 20 25 32)
+            width_constants=(13 17 20 25 32)
 
             # Find the the width constant that corresponds to the current window
             # size. If none is found then use the last one.
