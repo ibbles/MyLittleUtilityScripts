@@ -1,6 +1,11 @@
 #!/usr/bin/env fish
 
 
+if ! git status 1>/dev/null 2>/dev/null
+    echo "Not a Git repository.";
+    exit 1
+end
+
 echo -e "\ngit fetch"
 git fetch
 echo -e '\ngit log  --pretty=format:"%C(auto) %h %an %aI %Cgreen %s" HEAD..origin/'(mn.git_branch_id.fish)
