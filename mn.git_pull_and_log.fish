@@ -1,8 +1,10 @@
 #!/usr/bin/env fish
 
-
 echo -e "\ngit fetch"
 git fetch
+if test $status -ne 0
+    exit 1
+end
 echo -e '\ngit log  --pretty=format:"%C(auto) %h %an %aI %Cgreen %s" HEAD..origin/'(mn.git_branch_id.fish)
 git log  --pretty=format:"%C(auto) %h %an %aI %Cgreen %s" HEAD..origin/(mn.git_branch_id.fish)
 echo -e '\ngit log --pretty=format:"%C(auto) %h %an %ar %Cgreen %s" origin/'(mn.git_branch_id.fish)'..HEAD'
