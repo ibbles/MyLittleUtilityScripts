@@ -16,6 +16,9 @@ if test "$line" != "y"
 end
 echo -e "\ngit pull --prune"
 git pull --prune
+if test $status -ne 0
+    exit 1
+end
 echo -e "\n"
 mn.git_log.fish
 echo -e "\n"
