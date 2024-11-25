@@ -28,11 +28,39 @@ function print_usage
     exit 1
 end
 
+function get_agx_unreal_version_2 --argument-name ue_version_file
+    cat $ue_version_file
+end
 
-# set num_args (count $argv)
-# if  test $num_args -ne 1
-#     print_usage
-# end
+function read_value_json --argument-names file_path attribute_name
+    set value (grep --only-matching -P '"'$attribute_name'": [0-9]+' $file_path | cut -d ' ' -f2)
+    echo $value
+end
+
+function get_unreal_version_2 --argument-names unreal_path
+    set unreal_version_file "$unreal_path/Engine/Build/Build.version"
+    set version_file $unreal_path/Engine/Build/Build.version
+    set major_t (read_value_json $version_file "MajorVersion")
+    set minor_t (read_value_json $version_file "MinorVersion")
+    echo "$major_t.$minor_t"
+end
+
+function verify_unreal_version_compatibility --argument-names ue_version_file unreal_path
+    if test -z "$ue_version_file"
+        echo "verify_unreal_version_compatibility: No ue_version_file." 1>&2
+        return
+    end
+    if test -z "$unreal_path"
+        echo "verify_unreal_version_compatibility: No ue_version_file." 1>&2
+        return
+    end
+
+    set expected_version (get_agx_unreal_version_2 $ue_version_file)
+    set actual_version (get_unreal_version_2 $unreal_path)
+    if test "$expected_version" != "$actual_version"
+        echo -e "    VERSION MISMATCH:\n      Project uses $actual_version\n      AGX built with $expected_version"
+    end
+end
 
 function get_agx_version  --argument-names agx_version_file ue_version_file
     function _get_vertion_part --argument-names part agx_version_file
@@ -74,10 +102,11 @@ function show_info
     set in_project (find (dirname "$project_path")/Plugins -type f -name AGXUnreal.uplugin 2>/dev/null)
     if test -n "$in_project"
         echo "    Plugin in project:" (get_agxunreal_version $in_project)
-        set agx_version_file (find  (dirname $in_project)/Source/ThirdParty/agx -name "agx_version.h" 2>/dev/null)
+        set agx_version_file (find (dirname $in_project)/Source/ThirdParty/agx -name "agx_version.h" 2>/dev/null)
         set agx_ue_version_file (dirname $in_project)/Source/ThirdParty/agx/ue_version.txt
         if test -n "$agx_version_file"
             echo "    AGX Dynamics in plugin:" (get_agx_version "$agx_version_file")
+            verify_unreal_version_compatibility $agx_ue_version_file $ue_root
         else
             echo "    AGX Dynamics in plugin: No"
         end
