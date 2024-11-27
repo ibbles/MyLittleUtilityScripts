@@ -85,7 +85,12 @@ end
 
 function get_agxunreal_version --argument-names plugin_file
     set plugin_version (grep VersionName $plugin_file | cut -d ":" -f2)
-    set version_name (grep "AGXUNREAL_GIT_NAME" (dirname $plugin_file)/Source/AGXUnrealBarrier/Public/AGX_BuildInfo.generated.h  | sed -E 's,.*"(.*)".*,\1,')
+    set version_file (dirname $plugin_file)/Source/AGXUnrealBarrier/Public/AGX_BuildInfo.generated.h
+    if test ! -f "$version_file"
+        set version_name "(unknown)"
+    else
+        set version_name (grep "AGXUNREAL_GIT_NAME" $version_file | sed -E 's,.*"(.*)".*,\1,')
+    end
     if test -z "$version_name"
         set version_name "(unknown)"
     end
