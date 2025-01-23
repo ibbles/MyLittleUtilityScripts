@@ -144,8 +144,8 @@ end
 function generate_project
     check_ue_generate
     # -CMakefile -Makefile
-    echo "$ue_generate" "$project_path" -Makefile -Game -Engine
-    eval "$ue_generate" "$project_path" -Makefile -Game -Engine
+    echo "$ue_generate" "$project_path" -Game -Engine
+    eval "$ue_generate" "$project_path" -Game -Engine
 end
 
 
