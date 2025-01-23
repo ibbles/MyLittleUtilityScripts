@@ -11,6 +11,11 @@
 #
 # Dependencies: xwininfo, xprop, xdotool, wmctrl
 
+direction=smaller
+if [ "$1" == "--larger" ] ; then
+    direction=larger
+fi
+
 # Single-monitor version.
 function single_monitor {
     # Gather screen data.
@@ -97,13 +102,13 @@ function row_of_monitors {
             half_screen_width=$((${screen_width} / 2))
 
             # Size control parameter. These are in 20-based steps of a half
-            # screen width. Meaning, when the width constant is 20 the windo
+            # screen width. Meaning, when the width constant is 20 the window
             # will take up half the scren at the center, leaving one quarter at
             # each side. Larger numbers make the window smaller, for some
             # reason.
             #
             # 32 is for a single-file CLion / Rider at 100 character columns.
-            width_constants=(13 17 20 25 32)
+            width_constants=(13 17 20 25 32 40 50)
 
             # Find the the width constant that corresponds to the current window
             # size. If none is found then use the last one.
@@ -121,12 +126,21 @@ function row_of_monitors {
                 diff=${diff//-/} # Remove -, if it's there. I.e. absolute value.
                 if [ "${diff}" -lt "10" ] ; then
                     # They are close, so we want to switch to the next size.
-                    index=$((index + 1))
-                    if [ "${index}" -eq "${#width_constants[@]}" ] ; then
-                        # We were at the last size, wrap back to the first.
-                        # That is, the old size was the largest, so make
-                        # the window small.
-                        index=0
+                    if [ "$direction" == "smaller" ] ; then
+                        index=$((index + 1))
+                        if [ "${index}" -eq "${#width_constants[@]}" ] ; then
+                            # We were at the last size, wrap back to the first.
+                            # That is, the old size was the largest, so make
+                            # the window small.
+                            index=0
+                        fi
+                    else
+                        if [ "${index}" -eq 0 ] ; then
+                            # We were at the first size, wrap back to the last.
+                            index=$(( ${#width_constants[@]} - 1 ))
+                        else
+                            index=$((index - 1))
+                        fi
                     fi
 
                     # Compute new target size.
