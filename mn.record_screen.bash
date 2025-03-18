@@ -23,6 +23,16 @@ sizeY=""
 delay=5
 
 output="output.mp4"
+if [ -f "$output" ] ; then
+  echo "File '$output' already exists. Remove? [y/n]"
+  read doDelete
+  if [ "$doDelete" == "y" ] ; then
+    rm "$output"
+  else
+    exit 1
+  fi
+fi
+
 
 do_exit=false
 
@@ -167,17 +177,6 @@ case $opt in
   esac
 done
 echo "Options parsed."
-
-
-if [ -f "$output" ] ; then
-  echo "File '$output' already exists. Remove? [y/n]"
-  read doDelete
-  if [ "$doDelete" == "y" ] ; then
-    rm "$output"
-  else
-    exit 1
-  fi
-fi
 
 if [ "$posX" == "" ] ; then
   getMousePoint "Please position your mouse in the top left corner of the capture area."
