@@ -1,6 +1,6 @@
 #!/usr/bin/env fish
 
-set file "$HOME/VRAM_usage.dat"
+set file "/home/martinn/mirrored/analysis/VRAM_usage.dat"
 
 if test -f "$file"
    # echo "File already exists, not writing header."

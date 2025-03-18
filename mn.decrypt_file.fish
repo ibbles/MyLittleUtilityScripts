@@ -25,7 +25,7 @@ if test -f "$out_file"
     echo -e "Output file '$out_file_collision'     already exists,\nusing       '$out_file' instead." 1>&2
 end
 if test -f "$out_file"
-    echo "Outpuf file '$out_file' already exists, doing nothing." 1>&2
+    echo "Output file '$out_file' already exists, doing nothing." 1>&2
     exit 1
 end
 

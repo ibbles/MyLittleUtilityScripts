@@ -85,7 +85,12 @@ end
 
 function get_agxunreal_version --argument-names plugin_file
     set plugin_version (grep VersionName $plugin_file | cut -d ":" -f2)
-    set version_name (grep "AGXUNREAL_GIT_NAME" (dirname $plugin_file)/Source/AGXUnrealBarrier/Public/AGX_BuildInfo.generated.h  | sed -E 's,.*"(.*)".*,\1,')
+    set version_file (dirname $plugin_file)/Source/AGXUnrealBarrier/Public/AGX_BuildInfo.generated.h
+    if test ! -f "$version_file"
+        set version_name "(unknown)"
+    else
+        set version_name (grep "AGXUNREAL_GIT_NAME" $version_file | sed -E 's,.*"(.*)".*,\1,')
+    end
     if test -z "$version_name"
         set version_name "(unknown)"
     end
@@ -139,8 +144,8 @@ end
 function generate_project
     check_ue_generate
     # -CMakefile -Makefile
-    echo "$ue_generate" "$project_path" -Makefile -Game -Engine
-    eval "$ue_generate" "$project_path" -Makefile -Game -Engine
+    echo "$ue_generate" "$project_path" -Game -Engine
+    eval "$ue_generate" "$project_path" -Game -Engine
 end
 
 
@@ -317,7 +322,7 @@ function guess_unreal_path_from_uproject
     end
 
     # Find the Install.ini line that matches the wanted Unreal Engine version.
-    set engine_line (grep -m1 "$wanted_version" "$install_path")
+    set engine_line (grep -m1 "^$wanted_version=" "$install_path")
     # echo "Install.ini contains engine line '$engine_line'." 1>&2
     if test -z "$engine_line"
         # Did not find an exact match. If the wanted engine version is a
@@ -342,7 +347,7 @@ function guess_unreal_path_from_uproject
     end
     # echo "Install.ini search pattern: '$wanted_version'" 1>&2
     set install_path "$HOME/.config/Epic/UnrealEngine/Install.ini"
-    set engine_line (grep -m1 "$wanted_version" "$install_path")
+    set engine_line (grep -m1 "^$wanted_version=" "$install_path")
     # echo "Install.ini contains engine line '$engine_line'." 1>&2
     if test -z "$engine_line"
         echo "guess_unreal_path_from_uproject did not find an engine installation matching $wanted_version in $install_path." 1>&2
