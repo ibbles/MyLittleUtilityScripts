@@ -108,6 +108,16 @@ function getMousePoint
 }
 
 
+if [ -f "$output" ] ; then
+  echo "File '$output' already exists. Remove? [y/n]"
+  read doDelete
+  if [ "$doDelete" == "y" ] ; then
+    rm "$output"
+  else
+    exit 1
+  fi
+fi
+
 echo "Reading options."
 while getopts "d:p:zus:wih" opt; do
 case $opt in
@@ -167,17 +177,6 @@ case $opt in
   esac
 done
 echo "Options parsed."
-
-
-if [ -f "$output" ] ; then
-  echo "File '$output' already exists. Remove? [y/n]"
-  read doDelete
-  if [ "$doDelete" == "y" ] ; then
-    rm "$output"
-  else
-    exit 1
-  fi
-fi
 
 if [ "$posX" == "" ] ; then
   getMousePoint "Please position your mouse in the top left corner of the capture area."
