@@ -48,10 +48,13 @@ ffmpeg \
     -i "$in_path" \
     -c:v libx264 \
     -preset veryslow \
-    -qp 18 \
+    -qp 30 \
     ${pix_fmt} \
     "$out_path"
 set +x
+# The '-qp #' parameter above can be tweaked to control quality / size.
+# A low number, such as 18, gives a large file size and high quality.
+# A high number, such as 30, gives a smaller file size and lower quality.
 
 if [ "$pix_fmt" = "" ] ; then
     echo -e "\n\nNote: Compressed with default pixel format, not 420. Make sure the compressed video can be played on the intended player before deleting the source file."
