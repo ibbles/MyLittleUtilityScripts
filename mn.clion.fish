@@ -7,7 +7,12 @@ if test "$num_matches" -ne "1"
     exit 1
 end
 
-set clion_binary ~/bin/clion/clion-*/bin/clion.sh
+set clion_dir ~/bin/clion/clion-*/bin
+if test -f "$clion_dir/clion"
+   set clion_binary ~/bin/clion/clion-*/bin/clion
+else
+   set clion_binary ~/bin/clion/clion-*/bin/clion.sh
+end
 
 if test (count $argv) -eq 0
     echo "$clion_binary" (readlink -f .)
