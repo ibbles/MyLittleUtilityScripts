@@ -7,10 +7,15 @@ if test "$num_matches" -ne "1"
     exit 1
 end
 
+set clion_dir ~/bin/clion/clion-*/bin
+
 # With CLion 2024.3, or there about, the recommended entry point for CLion was
 # changed from being a script to being a binary. Let's try it for a while.
-set clion_binary ~/bin/clion/clion-*/bin/clion
-#set clion_binary ~/bin/clion/clion-*/bin/clion.sh
+if test -f "$clion_dir/clion"
+   set clion_binary "$clion_dir/clion"
+else
+   set clion_binary "$clion_dir/clion.sh"
+end
 
 if test (count $argv) -eq 0
     echo "$clion_binary" (readlink -f .)

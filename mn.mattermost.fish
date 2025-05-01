@@ -6,4 +6,4 @@ if test "$num_matches" -ne "1"
     ll -d ~/bin/mattermost-desktop-*-linux-x64
     exit 1
 end
-~/bin/mattermost-desktop-*-linux-x64/mattermost-desktop $argv
+~/bin/mattermost-desktop-*-linux-x64/mattermost-desktop --no-sandbox $argv
