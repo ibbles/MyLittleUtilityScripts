@@ -1,7 +1,23 @@
 #!/usr/bin/fish
 
-echo -e "\n\nUpdate:" ;and sudo apt update \
-     ;and echo -e "\n\nUpgrade:" ;and sudo apt upgrade \
-     ;and echo -e "\n\nFull upgrade:" ;and sudo apt full-upgrade \
-     ;and echo -e "\n\nStill remaining:" ;and apt list --upgradable
-     ;and echo -e "\n\nSnaps:" ;and sudo snap refresh
+echo -e "\n\nUpdate:"
+sudo apt update
+
+echo -e "\n\nUpgrade:"
+sudo apt upgrade
+
+echo -e "\n\nFull upgrade:"
+sudo apt full-upgrade
+
+echo -e "\n\nStill remaining:"
+apt list --upgradable
+
+if command -v snap
+    echo -e "\n\nSnaps:"
+    sudo snap refresh
+end
+
+if command -v flatpak
+    echo -e "\n\nFlatpaks:"
+    flatpak update
+end
