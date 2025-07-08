@@ -12,12 +12,12 @@ sudo apt full-upgrade
 echo -e "\n\nStill remaining:"
 apt list --upgradable
 
-if command -v snap
+if command -q --search snap
     echo -e "\n\nSnaps:"
     sudo snap refresh
 end
 
-if command -v flatpak
+if command -q --search flatpak
     echo -e "\n\nFlatpaks:"
     flatpak update
 end
