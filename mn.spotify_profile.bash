@@ -48,9 +48,21 @@
 
 
 
+# Control debug trace output.
+debug=true
+rm /tmp/mn.spotify_profile.bash.trace
+
+
 # Print a message to stderr.
 function log {
 	echo $@ >&2
+}
+
+function trace {
+    if [ "${debug}" = "true" ] ; then
+        echo $@
+        echo $@ >> /tmp/mn.spotify_profile.bash.log
+    fi
 }
 
 # Print an error message to stderr and then exit.
@@ -92,10 +104,13 @@ if [ -d "$snap_dir" ] ; then
 else
     base_dir="$HOME/.config/spotify"
 fi
+trace "base_dir is $base_dir."
+
 
 # The profile to switch to. First we try to read it from the next command line
 # parameter.
 profile=$1
+trace "profile is $profile."
 
 # Check if we got a profile from the command line.
 if [ -z "${profile}" ] && command -v dialog ; then
@@ -109,6 +124,7 @@ if [ -z "${profile}" ] && command -v dialog ; then
 		name=${profile_dir##spotify_}
 		profiles+=("$name")
 	done
+	trace "profiles are $profiles."
 
 	# Build menu items from the profile list.
 	menu_items=()
@@ -119,6 +135,7 @@ if [ -z "${profile}" ] && command -v dialog ; then
 		menu_items+=($i)
 		menu_items+=(${profiles[$i]})
 	done
+	trace "menu_items are $menu_items."
 
 	# Display the menu to the user.
 	choice=$(dialog --menu "Select a profile." 30 50 30 \
