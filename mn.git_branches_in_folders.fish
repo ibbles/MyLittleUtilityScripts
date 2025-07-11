@@ -7,8 +7,11 @@
 
 
 # Variant that finds all Git repositories.
-for git_dir in (find . -iname "*.git" -type d)
+for git_dir in (find . -iname "*.git" -type d | sort -n)
     set dir (dirname "$git_dir")
+    pushd "$dir"
     echo -en "$dir:\n  "
-    git -C "$dir" rev-parse --abbrev-ref HEAD 2>/dev/null
+    mn.git_branch_id.fish
+    popd
+    echo
 end
