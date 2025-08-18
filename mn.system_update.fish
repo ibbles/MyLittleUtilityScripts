@@ -12,6 +12,12 @@ sudo apt full-upgrade
 echo -e "\n\nStill remaining:"
 apt list --upgradable
 
+echo -e "\n\nRun autoremove? "
+read -P "[y/n] " input
+if test "$input" = "y"
+   sudo apt autoremove
+end
+
 if command -q --search snap
     echo -e "\n\nSnaps:"
     sudo snap refresh
