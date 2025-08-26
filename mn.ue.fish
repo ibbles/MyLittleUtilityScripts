@@ -125,7 +125,12 @@ function show_info
     echo "Engine:"
     echo "    Unreal Engine: $ue_root"
     echo "    Unreal Engine source: $ue_root_source"
-    set in_engine (find "$ue_root/Engine/Plugins" -type f -name AGXUnreal.uplugin 2>/dev/null)
+    # Look for Unreal Engine in the usual place first.
+    set in_engine (find "$ue_root/Engine/Plugins/Marketplace/AGXUnreal" -type f -name AGXUnreal.uplugin 2>/dev/null)
+    if test -z "$in_engine"
+        # If not there, search the entire Plugins directory.
+        set in_engine (find "$ue_root/Engine/Plugins" -type f -name AGXUnreal.uplugin 2>/dev/null)
+    end
     if test -n "$in_engine"
         echo "    Plugin in engine:" (get_agxunreal_version $in_engine)
         set agx_version_file (find  (dirname $in_engine)/Source/ThirdParty/agx -name "agx_version.h" 2>/dev/null)
