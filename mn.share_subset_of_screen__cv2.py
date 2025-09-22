@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 
+
+#
+# Consider using clipscreen instead.
+#
+
+
 # Based on an StackOverflow answer by Mark Setchell at
 # https://stackoverflow.com/questions/60264704/i-want-to-display-mouse-pointer-in-my-recording
 #
