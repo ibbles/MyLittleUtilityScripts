@@ -3,4 +3,9 @@ Name=Timed YouTube
 Exec=mn.youtube.fish
 Terminal=true
 Type=Application
-Icon=chrome-mpnpojknpmmopombnjdcgaaiekajbnjb-Profile_2
+# On my machine this is a YouTube icon.
+# Looks a bit random though so not sure
+# it will do the same on other machines.
+# Don't know how to for-sure get a YouTube
+# icon.
+Icon=chrome-agimnkijcaahngcdmfeangaknmldooml-Profile_1
