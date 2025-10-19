@@ -59,7 +59,7 @@ while true
 end
 
 # Timer expired, let the user know we're about to close the browser.
-dialog --msgbox "Time's Up, YouTube closing" 10 50
+dialog --timeout 10 --msgbox "Time's Up, YouTube closing" 10 50
 
 # Send polite quit request to the browser.
 kill %1
