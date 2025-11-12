@@ -53,6 +53,13 @@ while [ `date +%s` -lt $later ] ; do
     fi
 done
 
+# Clear the line for a new print.
+echo -en "$backspace"
+echo -en "$blank"
+echo -en "$backspace"
+
+echo -n "0 s: $title."
+
 if command -v notify-send >/dev/null ; then
     notify-send --expire-time 10000 "Time's up!" "$title"
 fi
