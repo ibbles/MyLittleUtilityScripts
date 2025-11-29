@@ -1,5 +1,10 @@
 #!/usr/bin/env fish
 
+if ! command -v convert
+   echo "'convert' not available, often part of the 'imagemagick' package." >&2
+   exit 1
+end
+
 set file $argv[1]
 
 
