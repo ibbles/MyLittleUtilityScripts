@@ -27,7 +27,7 @@ set num_files (count $files)
 
 
 set to_line_start (echo -e '\r')
-set fill_char "."
+set fill_char " "
 set width $COLUMNS
 set clear_prompt $to_line_start(string repeat -n $width $fill_char)$to_line_start
 
@@ -37,7 +37,12 @@ echo "Num files: $num_files"set counter 0
 for jpg in $files
     set counter (math $counter + 1)
     echo -n $clear_prompt
-    echo -n "Want to convert '$jpg' ($counter / $num_files)."
+    echo -n "Compressing '$jpg' ($counter / $num_files)."
     convert "$jpg" -quality 70% "compressed/$jpg"
     mv "$jpg" "original/$jpg"
 end
+
+echo
+echo "Original images are in 'original/'."
+echo "Compressed images are in 'compressed'."
+
