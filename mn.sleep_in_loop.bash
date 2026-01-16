@@ -28,8 +28,8 @@ turn_off
 while true ; do
     sleep 10
     if test_on ; then
-        echo "We are on, turning off in 5 s."
-        sleep 5
+        echo "We are on, turning off in 10 s."
+        sleep 10
         turn_off
     fi
 done
