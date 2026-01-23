@@ -1,6 +1,18 @@
 #!/usr/bin/env fish
 
-set binary /media/s1300/bin/Obsidian.AppImage
+if test -x /media/s1300/bin/Obsidian.AppImage
+    set binary /media/s1300/bin/Obsidian.AppImage
+else if test -x /media/s2000/bin/Obsidian.AppImage
+    set binary /media/s2000/bin/Obsidian.AppImage
+else if test -x /media/s1700/bin/Obsidian.AppImage
+    set binary /media/s1700/bin/Obsidian.AppImage
+else if test -x /media/s1700/bin/Obsidian.AppImage
+    set binary /media/s1700/bin/Obsidian.AppImage
+else
+    # TODO Check if we have Obsidian in $PATH.
+    echo "Did not find Obsidian.AppImage."
+    exit 1
+end
 
 # Either open the given directory / file, or the current directory with an
 # absolute path.
