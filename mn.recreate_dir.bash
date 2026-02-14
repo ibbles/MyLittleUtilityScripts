@@ -14,9 +14,11 @@ if [ "${to_recreate}" == "${parent}" ] ; then
     fail "Could not change working directory."
 fi
 
-read -p "Delete '${to_recreate}'? [y/n] " do_delete
-if [ "${do_delete}" != "y" ] ; then
+dirname=`basename "${to_recreate}"`
+read -p "Type '${dirname}' to delete '${to_recreate}': " do_delete
+if [ "${do_delete}" != "${dirname}" ] ; then
     fail "Doing nothing."
+    exit 1
 fi
 
 rm -rf "${to_recreate}"
