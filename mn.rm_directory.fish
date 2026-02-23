@@ -13,10 +13,11 @@ if test ! -d "$directory_path"
 	exit 1
 end
 
-read -P "Remove directory '$directory_path'? [y/n] " reply
-if test "$reply" != "y"
-	echo "Not removing"
-	exit 1
+set dirname (basename "$directory_path")
+read -P "Type '$dirname' to delete '$directory_path': " do_delete
+if test "$do_delete" != "$dirname"
+    fail "Doing nothing."
+    exit 1
 end
 
 # Cannot remove write-protected files, so un-write-protect them.
@@ -27,3 +28,4 @@ if test $status -ne 0
 end
 
 command rm -r "$directory_path"
+
