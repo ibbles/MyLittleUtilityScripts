@@ -7,7 +7,7 @@ if test "$num_matches" -ne "1"
     exit 1
 end
 
-set rider_binary ~/bin/rider/rider-*/bin/rider.sh
+set rider_binary ~/bin/rider/rider-*/bin/rider
 
 if test (count $argv) -eq 0
     if test (count *.uproject) -gt 0
