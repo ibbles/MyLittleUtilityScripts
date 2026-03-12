@@ -21,6 +21,11 @@ elif [ "${last_char}" == "m" ] ; then
     duration_minutes="${duration%m}"
     duration_seconds="$((duration_minutes * 60))"
     later=$(($now + ($duration_minutes * 60)))
+elif [ "${last_char}" == "h" ] ; then
+    duration_hours="${duration%h}"
+    duration_seconds=$((duration_hours * 3600))
+    duration_minutes=$((duration_hours * 60))
+    later=$((now + duration_seconds))
 else
     # Not 's' or 'm' suffix. For now just assume it to be a number in minutes.
     duration_minutes=$duration
