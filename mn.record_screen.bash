@@ -225,15 +225,16 @@ pauseWithMessage "Video capture starting in..."
 # not yet found any way to determine when it's gonna be which. Seems to change
 # every fifth reboot or so. Just swap here whenever it doesn't work.
 
-#avconv -f x11grab -r 30 -s "$sizeX"x"$sizeY" -i :0.0+"$posX","$posY" -c:v    libx264 "$output"
+#avconv -f x11grab -r 30 -s "$sizeX"x"$sizeY" -i +"$posX","$posY" -c:v    libx264 "$output"
 
 # There has been reports that files generated with this don't work on iPads.
-#ffmpeg -f x11grab -r 30 -s ${sizeX}x${sizeY} -i :0.0+${posX},${posY} -acodec pcm_s16le -vcodec libx264 -preset medium -threads 0 -vf format=yuv420p "${output}"
+#ffmpeg -f x11grab -r 30 -s ${sizeX}x${sizeY} -i +${posX},${posY} -acodec pcm_s16le -vcodec libx264 -preset medium -threads 0 -vf format=yuv420p "${output}"
 
 # This one is supposed to work on iPads. 'format=' has been changed to 'pix_fmt'
 # It does not record audio. Look into "-f pulse -ac 2 -i default" for this.
 # See https://trac.ffmpeg.org/wiki/Capture/Desktop
-ffmpeg -f x11grab -show_region 1 -r 30 -s ${sizeX}x${sizeY} -i :0.0+${posX},${posY} -acodec pcm_s16le -vcodec libx264 -preset medium -threads 0 -pix_fmt yuv420p "${output}"
+echo ffmpeg -f x11grab -show_region 1 -r 30 -s ${sizeX}x${sizeY} -i +${posX},${posY} -acodec pcm_s16le -vcodec libx264 -preset medium -threads 0 -pix_fmt yuv420p "${output}"
+ffmpeg -f x11grab -show_region 1 -r 30 -s ${sizeX}x${sizeY} -i +${posX},${posY} -acodec pcm_s16le -vcodec libx264 -preset medium -threads 0 -pix_fmt yuv420p "${output}"
 
 # The above uses the CPU to encode the video, since it uses '-vcodec libx264' and a bunch parameters to that.
 # It makes my fans spin like crazy and I worry that it will have a negative performance impact.
@@ -242,7 +243,7 @@ ffmpeg -f x11grab -show_region 1 -r 30 -s ${sizeX}x${sizeY} -i :0.0+${posX},${po
 # I got the arguments from https://docs.nvidia.com/video-technologies/video-codec-sdk/ffmpeg-with-nvidia-gpu/.
 # It talks about building ffmpeg, but on Ubuntu 20.04 I could just use the system ffmpeg.
 # There are more flags on the page linked above.
-#ffmpeg -f x11grab -show_region 1 -r 30 -s ${sizeX}x${sizeY} -hwaccel cuda -hwaccel_output_format cuda -i :0.0+${posX},${posY} -acodec pcm_s16le -c:v h264_nvenc -b:v 5M "${output}"
+#ffmpeg -f x11grab -show_region 1 -r 30 -s ${sizeX}x${sizeY} -hwaccel cuda -hwaccel_output_format cuda -i +${posX},${posY} -acodec pcm_s16le -c:v h264_nvenc -b:v 5M "${output}"
 
 
 
@@ -252,7 +253,7 @@ ffmpeg -f x11grab -show_region 1 -r 30 -s ${sizeX}x${sizeY} -i :0.0+${posX},${po
 
 
 ## Never tried this one. There may be other things to write after -pre.
-#avconv -f x11grab -r 30 -s 1280x720          -i :0.0+0,0             -vcodec libx264 -pre lossless_ultrafast -threads 0 "$output"
+#avconv -f x11grab -r 30 -s 1280x720          -i +0,0             -vcodec libx264 -pre lossless_ultrafast -threads 0 "$output"
 
 # Suggestions for -pre:
 # ➤find /usr/share/avconv/libx264-* -exec basename '{}' ';'
