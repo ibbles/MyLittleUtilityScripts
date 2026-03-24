@@ -65,14 +65,14 @@ echo -en "$backspace"
 
 echo -n "0 s: $title."
 
-if command -v notify-send >/dev/null ; then
-    notify-send --expire-time 10000 "Time's up!" "$title"
+if command -v notify-send >/dev/null 2>&1 ; then
+    notify-send --expire-time 10000 "Time's up!" "$title" >/dev/null 2>&1
 fi
-if command -v zenity >/dev/null ; then
-    zenity --info --text "$title" &
+if command -v zenity >/dev/null 2>&1 ; then
+    zenity --info --text "$title" >/dev/null 2>&1 &
 fi
-if command -v whiptail >/dev/null ; then
-    whiptail --title "Time's up!" --msgbox "$title" 10 50
-elif command -v dialog >/dev/null ; then
-    dialog --infobox "$title" 10 50
+if command -v whiptail >/dev/null 2>&1 ; then
+    whiptail --title "Time's up!" --msgbox "$title" 10 50 >/dev/null 2>&1
+elif command -v dialog >/dev/null 2>&1 ; then
+    dialog --infobox "$title" 10 50 >/dev/null 2>&1
 fi
