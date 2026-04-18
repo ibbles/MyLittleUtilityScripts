@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Tell the parent shell that ctrl+c to exit is not a sign of errors. This is so
+# Tell the parent shell that ctrl+c to exit is not a sign of error. This is so
 # that a terminal running the script started with '-e' will close.
 trap ctrl_c INT
 function ctrl_c() {
@@ -14,7 +14,7 @@ echo -e "\n\n\n\n\n         Sleeping in loop.\n\n              CTRL+C to cancel.
 
 
 function turn_off {
-    echo "Turn off."
+    echo $(date) "Turn off."
     xset dpms force off
 }
 
@@ -28,7 +28,7 @@ turn_off
 while true ; do
     sleep 10
     if test_on ; then
-        echo "We are on, turning off in 10 s."
+        echo $(date) "We are on, turning off in 10 s."
         sleep 10
         turn_off
     fi
