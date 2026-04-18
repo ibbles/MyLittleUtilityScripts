@@ -326,8 +326,29 @@ function guess_unreal_path_from_uproject
        return
     end
 
+    # TODO Simplify Unreal Engine installation discovery code.
+    #
+    # This seems way more complicated than it needs to be. These are the strings
+    # we need to look for:
+    # - #.#=PATH
+    # - #.#.#=PATH
+    # - UE_#.#=PATH
+    # - UE_#.#.#=PATH
+    #
+    # The pattern is that the line can be with or without a UE_-prefix, and it
+    # can have a two or three digit version number. I think that can be expressed
+    # with a single regular expression and a single call to grep.
+
     # Find the Install.ini line that matches the wanted Unreal Engine version.
     set engine_line (grep -m1 "^$wanted_version=" "$install_path")
+    echo "First search attempt: '$engine_line'" 1>&2
+    if test -z "$engine_line"
+        # Did not find an entry named with just the engine version.
+        # With with 'UE_' prefix as well.
+        echo "Trying with UE_ prefix" 1>&2
+        set engine_line (grep -m1 "^UE_$wanted_version=" "$install_path")
+        echo "Second search attempt: '$engine_line'" 1>&2
+    end
     # echo "Install.ini contains engine line '$engine_line'." 1>&2
     if test -z "$engine_line"
         # Did not find an exact match. If the wanted engine version is a
@@ -339,6 +360,9 @@ function guess_unreal_path_from_uproject
             if test "$last_digit" = "0"
                 # Strip trailing "\.0".
                 set wanted_version (string sub --length (expr (string length "$wanted_version") - 3) "$wanted_version")
+                set engine_line (grep -m1 "^$wanted_version=" "$install_path")
+                # TODO What about 'UE_' prefix here? This entire parsing setup
+                # is way too complicated. Simplfy.
             else
                 echo "Third and last digit is not 0, cannot strip it." 1>&2
                 echo ""
@@ -351,8 +375,8 @@ function guess_unreal_path_from_uproject
         end
     end
     # echo "Install.ini search pattern: '$wanted_version'" 1>&2
-    set install_path "$HOME/.config/Epic/UnrealEngine/Install.ini"
-    set engine_line (grep -m1 "^$wanted_version=" "$install_path")
+    #set install_path "$HOME/.config/Epic/UnrealEngine/Install.ini"
+    #set engine_line (grep -m1 "^$wanted_version=" "$install_path")
     # echo "Install.ini contains engine line '$engine_line'." 1>&2
     if test -z "$engine_line"
         echo "guess_unreal_path_from_uproject did not find an engine installation matching $wanted_version in $install_path." 1>&2
