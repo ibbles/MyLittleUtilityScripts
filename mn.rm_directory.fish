@@ -1,5 +1,10 @@
 #!/usr/bin/fish
 
+function fail
+    echo $argv 1>&2
+    exit 1
+end
+
 if test (count $argv) -ne 1
 	echo "Can only delete one directory at a time."
 	exit 1
