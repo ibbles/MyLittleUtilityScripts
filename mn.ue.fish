@@ -341,13 +341,10 @@ function guess_unreal_path_from_uproject
 
     # Find the Install.ini line that matches the wanted Unreal Engine version.
     set engine_line (grep -m1 "^$wanted_version=" "$install_path")
-    echo "First search attempt: '$engine_line'" 1>&2
     if test -z "$engine_line"
         # Did not find an entry named with just the engine version.
         # With with 'UE_' prefix as well.
-        echo "Trying with UE_ prefix" 1>&2
         set engine_line (grep -m1 "^UE_$wanted_version=" "$install_path")
-        echo "Second search attempt: '$engine_line'" 1>&2
     end
     # echo "Install.ini contains engine line '$engine_line'." 1>&2
     if test -z "$engine_line"
