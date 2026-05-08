@@ -22,8 +22,11 @@ if set -q _flag_inner_dir
     set inner_dir $_flag_inner_dir
 end
 
+
+
 set docker_args run -i -t --rm=true \
     --security-opt seccomp=unconfined \
+    --security-opt apparmor=unconfined \
     --name "Codex.$dirname" \
     --user (id -u):(id -g) \
     -v $HOME/.codex:/codex-home/ -e CODEX_HOME=/codex-home \
