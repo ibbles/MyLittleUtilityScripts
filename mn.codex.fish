@@ -23,14 +23,29 @@ if set -q _flag_inner_dir
 end
 
 
-
+# --security-opt seccomp=unconfined
+#   Needed to allow bwrap to make system calls to create namespaces.
+#   I don't know the details of this. I assume there is a way to
+#   allow a more limited set of system calls than 'unconfined'.
+# --security-opt apparmor=unconfined
+#   Needed for bwrap to be able to mount filesystem directories.
+#   We have two layers of AppArmor restrictions here, one for
+#   'docker' running on the host and one for 'bwrap' running in 
+#   the container. I'm not sure which of these apparmor=unconfined
+#   affects. 'cat /proc/self/attr/current' and 'aa-status' has
+#   something to do with this.
+#   
+#   See also https://developers.openai.com/codex/concepts/sandboxing#prerequisites
+#   and my docker_with_codex.md note.
 set docker_args run -i -t --rm=true \
     --security-opt seccomp=unconfined \
     --security-opt apparmor=unconfined \
     --name "Codex.$dirname" \
     --user (id -u):(id -g) \
-    -v $HOME/.codex:/codex-home/ -e CODEX_HOME=/codex-home \
-    -v (realpath .):/"$inner_dir" --workdir /"$inner_dir" \
+    -v $HOME/.codex:/codex-home/ \
+    -e CODEX_HOME=/codex-home \
+    -v (realpath .):/"$inner_dir" \
+    --workdir /"$inner_dir" \
     -v $HOME/unreal_engine/:/UnrealEngine:ro \
     codex
 
