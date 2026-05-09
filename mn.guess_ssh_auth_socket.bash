@@ -1,22 +1,45 @@
-# Source this file to locate a working SSH agent socket and set SSH_AUTH_SOCK.
-# Useful when reconnecting to an existing shell (e.g. tmux/screen) where the
-# original socket path has gone stale.
+#!/usr/bin/env bash
+# Prints a shell assignment for SSH_AUTH_SOCK pointing to a working agent socket.
+# Intended to be eval'd, not sourced:
+#
+#   Bash/Zsh:  eval "$(guess_ssh_auth_sock)"
+#   Fish:      eval (guess_ssh_auth_sock --fish)
+#
+# Shell syntax is selected by --fish / --sh flag, or auto-detected via
+# $FISH_VERSION (exported by Fish into child processes).
 
-# If the current value already works, do nothing.
+_shell=sh
+case "$1" in
+    --fish) _shell=fish ;;
+    --sh)   _shell=sh   ;;
+    "")     [[ -n "$FISH_VERSION" ]] && _shell=fish ;;
+    *)      echo "usage: guess_ssh_auth_sock [--sh | --fish]" >&2; exit 1 ;;
+esac
+
+_emit() {
+    if [[ "$_shell" == fish ]]; then
+        echo "set -gx SSH_AUTH_SOCK $1"
+    else
+        echo "export SSH_AUTH_SOCK=$1"
+    fi
+}
+
+# If the inherited value already works, re-emit it unchanged.
 if [[ -n "$SSH_AUTH_SOCK" ]] && ssh-add -l &>/dev/null; then
-    return 0
+    _emit "$SSH_AUTH_SOCK"
+    exit 0
 fi
 
 _candidates=()
 
-while IFS= read -r _candidate; do
-    _candidates+=("$_candidate")
+while IFS= read -r _c; do
+    _candidates+=("$_c")
 done < <(find /tmp /run/user 2>/dev/null \
               -maxdepth 4 \
               \( -name 'agent.*' -o -name 'S.ssh' -o -name 'openssh_agent' -o -name 'ssh' \) \
               -type s \
               2>/dev/null \
-         | sort -t. -k2 -rn)   # newest PID last → try highest PIDs first
+         | sort -t. -k2 -rn)
 
 # Fallback: mine SSH_AUTH_SOCK out of other processes' environments.
 if [[ ${#_candidates[@]} -eq 0 ]]; then
@@ -26,10 +49,10 @@ if [[ ${#_candidates[@]} -eq 0 ]]; then
     while [[ "$_pid" -gt 1 ]]; do
         _cmdline=$(tr '\0' ' ' < "/proc/$_pid/cmdline" 2>/dev/null)
         if [[ "$_cmdline" == sshd* ]]; then
-            _candidate=$(grep -oP '(?<=SSH_AUTH_SOCK=)[^\0]+' \
-                         "/proc/$_pid/environ" 2>/dev/null | head -1)
-            if [[ -n "$_candidate" ]]; then
-                _candidates+=("$_candidate")
+            _c=$(grep -oP '(?<=SSH_AUTH_SOCK=)[^\0]+' \
+                 "/proc/$_pid/environ" 2>/dev/null | head -1)
+            if [[ -n "$_c" ]]; then
+                _candidates+=("$_c")
                 break
             fi
         fi
@@ -41,30 +64,23 @@ if [[ ${#_candidates[@]} -eq 0 ]]; then
     # agent (e.g. GNOME Keyring with ~100 inheritors vs. niche alternatives
     # with only a handful).
     if [[ ${#_candidates[@]} -eq 0 ]]; then
-        _candidate=$(
+        _c=$(
             find /proc -maxdepth 2 -name environ -readable 2>/dev/null \
             | xargs -I{} sh -c 'tr "\0" "\n" < "$1" 2>/dev/null' -- {} \
             | grep -oP '(?<=SSH_AUTH_SOCK=)\S+' \
             | sort | uniq -c | sort -rn \
             | awk 'NR==1 {print $2}'
         )
-        [[ -n "$_candidate" ]] && _candidates+=("$_candidate")
+        [[ -n "$_c" ]] && _candidates+=("$_c")
     fi
 fi
 
-_found=""
-for _candidate in "${_candidates[@]}"; do
-    if SSH_AUTH_SOCK="$_candidate" ssh-add -l &>/dev/null; then
-        _found="$_candidate"
-        break
+for _c in "${_candidates[@]}"; do
+    if SSH_AUTH_SOCK="$_c" ssh-add -l &>/dev/null; then
+        _emit "$_c"
+        exit 0
     fi
 done
 
-if [[ -n "$_found" ]]; then
-    export SSH_AUTH_SOCK="$_found"
-    echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK"
-else
-    echo "guess_ssh_auth_sock: no working SSH agent socket found" >&2
-fi
-
-unset _candidates _candidate _cmdline _pid _found
+echo "guess_ssh_auth_sock: no working SSH agent socket found" >&2
+exit 1
