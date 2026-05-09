@@ -42,8 +42,8 @@ set docker_args run -i -t --rm=true \
     --security-opt apparmor=unconfined \
     --name "Codex.$dirname" \
     --user (id -u):(id -g) \
-    -v $HOME/.codex:/codex-home/ \
-    -e CODEX_HOME=/codex-home \
+    -v /media/s2000/codex_cli_home:/codex_cli_home/ \
+    -e CODEX_HOME=/codex_cli_home \
     -v (realpath .):/"$inner_dir" \
     --workdir /"$inner_dir" \
     -v $HOME/unreal_engine/:/UnrealEngine:ro \

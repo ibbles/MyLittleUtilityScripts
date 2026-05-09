@@ -25,8 +25,8 @@ end
 set docker_args run -i -t --rm=true \
     --name "Claude.$dirname" \
     --user (id -u):(id -g) \
-    -v /media/s2000/claude_code_home:/home/ubuntu/claude_code_home \
-    -e CLAUDE_CONFIG_DIR=/home/ubuntu/claude_code_home \
+    -v /media/s2000/claude_code_home:/claude_code_home \
+    -e CLAUDE_CONFIG_DIR=/claude_code_home \
     -v (realpath .):"$inner_dir" \
     --workdir /"$inner_dir" \
     -v $HOME/unreal_engine/:/UnrealEngine:ro \
