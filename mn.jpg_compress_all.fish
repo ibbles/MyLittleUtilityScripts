@@ -1,9 +1,13 @@
 #!/usr/bin/env fish
 
+# Script that re-compresses all .jpg files in the current directory.
+# The compressed images are placed in './compressed/'.
+# The original images are moved to './original/'.
+
 set should_exit false
 
 if ! command -q convert
-    echo >&2 "'convert' now available, often part of the 'imagemagick' package."
+    echo >&2 "'convert' not available, often part of the 'imagemagick' package."
     set should_exit true
 end
 
@@ -25,7 +29,7 @@ end
 set files *.jpg
 set num_files (count $files)
 
-
+# Variables used by the progress bar renderer.
 set to_line_start (echo -e '\r')
 set fill_char " "
 set width $COLUMNS
