@@ -22,7 +22,6 @@ if set -q _flag_inner_dir
     set inner_dir $_flag_inner_dir
 end
 
-
 set extra_volumes
 if set -q _flag_volume
     for v in $_flag_volume

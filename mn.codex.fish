@@ -1,7 +1,7 @@
 #!/usr/bin/env fish
 
 
-argparse 'h/help' 'f/full_dir' 'i/inner_dir=' -- $argv
+argparse 'h/help' 'f/full_dir' 'i/inner_dir=' 'v/volume=+' -- $argv
 or return
 
 set dirname (basename (pwd))
@@ -12,14 +12,21 @@ if set -q _flag_help
     echo ""
     echo "-f --full_dir: Use the full current working directory path also in the Docker image."
     echo "-i PATH --inner_dir=PATH: Directory inside the Docker container where the current working directory should be mounted. Overrides --full_dir."
+    echo "-v HOST:CONTAINER --volume=HOST:CONTAINER: Extra volume mount, passed directly to Docker. Can be specified multiple times."
     exit 1
 end
 if set -q _flag_full_dir
     set inner_dir (pwd)
 end
 if set -q _flag_inner_dir
-    echo "Got inner_dir: '$_flag_inner_dir'."
     set inner_dir $_flag_inner_dir
+end
+
+set extra_volumes
+if set -q _flag_volume
+    for v in $_flag_volume
+        set -a extra_volumes -v $v
+    end
 end
 
 
@@ -30,11 +37,11 @@ end
 # --security-opt apparmor=unconfined
 #   Needed for bwrap to be able to mount filesystem directories.
 #   We have two layers of AppArmor restrictions here, one for
-#   'docker' running on the host and one for 'bwrap' running in 
+#   'docker' running on the host and one for 'bwrap' running in
 #   the container. I'm not sure which of these apparmor=unconfined
 #   affects. 'cat /proc/self/attr/current' and 'aa-status' has
 #   something to do with this.
-#   
+#
 #   See also https://developers.openai.com/codex/concepts/sandboxing#prerequisites
 #   and my docker_with_codex.md note.
 set docker_args run -i -t --rm=true \
@@ -47,6 +54,7 @@ set docker_args run -i -t --rm=true \
     -v (realpath .):/"$inner_dir" \
     --workdir /"$inner_dir" \
     -v $HOME/unreal_engine/:/UnrealEngine:ro \
+    $extra_volumes \
     codex
 
 echo docker (string escape -- $docker_args)
