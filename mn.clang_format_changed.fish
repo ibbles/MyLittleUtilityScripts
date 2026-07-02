@@ -16,10 +16,6 @@ for file in $files
     set full_files $full_files "$repo_root"/"$file"
 end
 
-echo "Clang Format"
-mn.print_args.bash $full_files
-echo "?"
-
 read -P "[y/n]" do_it
 if test "$do_it" = "y"
    clang-format -i -style=file $full_files
