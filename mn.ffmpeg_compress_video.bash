@@ -1,14 +1,14 @@
 #!/bin/bash
 
-usage="Usage: $0 [420] INPUT_VIDEO"
+usage="Usage: $0 [not420] INPUT_VIDEO"
 
-pix_fmt=""
+pix_fmt="-pix_fmt yuv420p"
 while [ $# -gt 1 ] ; do
     option=$1
     shift
     case $option in
-    420)
-        pix_fmt="-pix_fmt yuv420p"
+    not420)
+        pix_fmt=""
         ;;
     *)
         echo -e "Unknown option $option."
