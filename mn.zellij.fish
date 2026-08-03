@@ -35,7 +35,10 @@ if test -z "$selected_name"
     # The user hit Esc or selected Cancel.
     echo "Nothing selected, doing nothing."
     exit 1
-else if test "$selected_name" = "New Generic"
+end
+
+clear
+if test "$selected_name" = "New Generic"
     mn.zellij_new_generic.fish
 else if test "$selected_name" = "Bash Shell"
     bash
