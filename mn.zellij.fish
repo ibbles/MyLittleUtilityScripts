@@ -8,7 +8,7 @@
 # heuristic that auto-generated names all two all-lower-case words with a '-'
 # between them. Don't give your own sessions name that match this pattern.
 set auto_name_regex '[a-z]+-[a-z]+'
-set names (zellij list-sessions --short --no-formatting | grep -vP $auto_name_regex)
+set names (zellij list-sessions --short --no-formatting | grep -vP $auto_name_regex | sort -n)
 
 # Build menu items to display to the user.
 # "New Generic" is a special (reseved) name that causes a new "Generic $'
