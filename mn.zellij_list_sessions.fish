@@ -4,4 +4,4 @@
 # Makes it easy to find named sessions, if you named them with at least one
 # upper-case letter or special, non-'-', character.
 
-zellij list-sessions -sn | grep --color=never -Pv '^[a-z]+-[a-z]+$'
+zellij list-sessions --short --no-formatting | grep --color=never -Ev '^[a-z]+-[a-z]+$' | sort -V
