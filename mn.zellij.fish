@@ -4,16 +4,26 @@
 # or create a new session. Also has support for launching a Zellij-free
 # shell using Bash or Fish.
 
-# Find the names of the currently existing explicitly named Zellij sessions.
-set names (mn.zellij_list_sessions.fish)
-
-# Build menu items to display to the user.
-# "New Generic" is a special (reseved) name that causes a new "Generic #'
-# session to be created.
 set menu_items
-for name in $names
-    set -a menu_items $name $name
+
+for session_line in (zellij list-sessions --no-formatting | sort -V)
+    # To get the name, first remove everything from the first '[', then remove
+    # the ' ' that is printed between the name and the '['.
+    set session_name (echo "$session_line" | grep -oE '^[^[]+')
+    set session_name (string sub --end=-1 "$session_name")
+
+    if string match -rq '.+ \(EXITED' "$session_line"
+        set session_description "[exited] $session_name"
+    else
+        set session_description "[live]   $session_name"
+    end
+
+    set -a menu_items "$session_name" "$session_description"
+
+    echo "name: '$session_name', description: '$session_description'"
 end
+
+
 
 # Add custom commands, i.e. menu items that are not names of existing Zellij sessions.
 set -a menu_items \
@@ -21,7 +31,6 @@ set -a menu_items \
     "Bash Shell" "Bash Shell" \
     "Fish Shell" "Fish Shell"
 
-# TODO Use 'set --append' in the above instead of expanding the list every time.
 
 # Display the menu to the user.
 #
@@ -35,7 +44,7 @@ set -a menu_items \
 # 'selected_name'. We then, the order is important, take stdout, the stream that
 # contains the menu list the user is interacting with, and send that to the
 # terminal (>/dev/tty), bypassing the subshell capture.
-set selected_name (dialog --menu "Select a session" 50 100 10 $menu_items 2>&1  >/dev/tty)
+set selected_name (dialog --no-tags --menu  "Select a session" 50 100 10 $menu_items 2>&1  >/dev/tty)
 
 clear
 switch "$selected_name"
