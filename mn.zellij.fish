@@ -7,6 +7,8 @@
 set menu_items
 
 for session_line in (zellij list-sessions --no-formatting | sort -V)
+    # An example line of the 'zellij list-sessions' output:
+    #   Random Stuff [Created 38m 55s ago] (EXITED - attach to resurrect)
     # To get the name, first remove everything from the first '[', then remove
     # the ' ' that is printed between the name and the '['.
     set session_name (echo "$session_line" | grep -oE '^[^[]+')
