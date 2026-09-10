@@ -8,13 +8,15 @@
 set names (mn.zellij_list_sessions.fish)
 
 # Build menu items to display to the user.
-# "New Generic" is a special (reseved) name that causes a new "Generic $'
+# "New Generic" is a special (reseved) name that causes a new "Generic #'
 # session to be created.
 set menu_items
 for name in $names
-    set menu_items $menu_items $name $name
+    set -a menu_items $name $name
 end
-set menu_items $menu_items \
+
+# Add custom commands, i.e. menu items that are not names of existing Zellij sessions.
+set -a menu_items \
     "New Generic" "New Generic" \
     "Bash Shell" "Bash Shell" \
     "Fish Shell" "Fish Shell"
