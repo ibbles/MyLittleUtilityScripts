@@ -1,14 +1,10 @@
 #!/usr/bin/env fish
 
-# Starter-script for Zellij that let's you chose a session to attach to.
+# Starter-script for Zellij that let's you chose a session to attach to,
+# or create a new session. Also has support for launching a Zellij-free
+# shell using Bash or Fish.
 
-# We don't include the auto-generated random names that Zellij defaults to,
-# this script only shows the sessions that the user has named explicitly.
-# I'm not sure how to propertly identify such sessions. Here we use the
-# heuristic that auto-generated names have two all-lower-case words with a '-'
-# between them. Don't give your own sessions name that match this pattern.
-set auto_name_regex '^[a-z]+-[a-z]+$'
-#set names (zellij list-sessions --short --no-formatting | grep -vP $auto_name_regex | sort -V)
+# Find the names of the currently existing explicitly named Zellij sessions.
 set names (mn.zellij_list_sessions.fish)
 
 # Build menu items to display to the user.
