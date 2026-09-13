@@ -8,13 +8,12 @@ set menu_items
 
 for session_line in (zellij list-sessions --no-formatting | sort -V)
     # An example line of the 'zellij list-sessions' output:
-    #   Random Stuff [Created 38m 55s ago] (EXITED - attach to resurrect)
-    # To get the name, first remove everything from the first '[', then remove
-    # the ' ' that is printed between the name and the '['.
-    set session_name (echo "$session_line" | grep -oE '^[^[]+')
-    set session_name (string sub --end=-1 "$session_name")
+    #   My Session [Created 38m 55s ago] (EXITED - attach to resurrect)
+    # To get the name, remove everything from the first ' [' to the end
+    # of the line.
+    set session_name (string replace -r ' \[.*$' '' "$session_line")
 
-    if string match -rq '.+ \(EXITED' "$session_line"
+    if string match -q '* (EXITED*' "$session_line"
         set session_description "[exited] $session_name"
     else
         set session_description "[live]   $session_name"
