@@ -1,11 +1,14 @@
 #!/usr/bin/env fish
 
 
-argparse 'h/help' 'f/full_dir' 'i/inner_dir=' 'v/volume=+' -- $argv
+argparse 'h/help' 'f/full_dir' 'i/inner_dir=' 'v/volume=+' 's/suffix=' -- $argv
 or return
 
 set dirname (basename (pwd))
 set inner_dir "/cwd"
+set extra_volumes
+set image_name "codex"
+set container_name "Codex.$dirname"
 
 if set -q _flag_help
     echo "Run a Docker container with Codex installed and mount the current working directory."
@@ -13,8 +16,10 @@ if set -q _flag_help
     echo "-f --full_dir: Use the full current working directory path also in the Docker image."
     echo "-i PATH --inner_dir=PATH: Directory inside the Docker container where the current working directory should be mounted. Overrides --full_dir."
     echo "-v HOST:CONTAINER --volume=HOST:CONTAINER: Extra volume mount, passed directly to Docker. Can be specified multiple times."
+    echo "-s NAME_SUFFIX --suffix=NAME_SUFFIX: Suffix to add to the Docker container name."
     exit 1
 end
+
 if set -q _flag_full_dir
     set inner_dir (pwd)
 end
@@ -27,6 +32,9 @@ if set -q _flag_volume
     for v in $_flag_volume
         set -a extra_volumes -v $v
     end
+end
+if set -q _flag_suffix
+    set container_name "$container_name.$_flag_suffix"
 end
 
 
@@ -47,7 +55,7 @@ end
 set docker_args run -i -t --rm=true \
     --security-opt seccomp=unconfined \
     --security-opt apparmor=unconfined \
-    --name "Codex.$dirname" \
+    --name "$container_name" \
     --user (id -u):(id -g) \
     -v /media/s2000/codex_cli_home:/codex_cli_home/ \
     -e CODEX_HOME=/codex_cli_home \
@@ -55,7 +63,7 @@ set docker_args run -i -t --rm=true \
     --workdir /"$inner_dir" \
     -v $HOME/unreal_engine/:/UnrealEngine:ro \
     $extra_volumes \
-    codex
+    $image_name
 
 echo docker (string escape -- $docker_args)
 
