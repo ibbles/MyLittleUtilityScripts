@@ -1,11 +1,11 @@
 #!/usr/bin/env fish
 
 
-argparse 'h/help' 'f/full_dir' 'i/inner_dir=' 'v/volume=+' 's/suffix=' -- $argv
+argparse 'h/help' 'v/volume=+' 'i/isuffix=' 'c/csuffix='  -- $argv
 or return
 
 set dirname (basename (pwd))
-set inner_dir "/cwd"
+set inner_dir (pwd)
 set extra_volumes
 set image_name "codex"
 set container_name "Codex.$dirname"
@@ -13,19 +13,12 @@ set container_name "Codex.$dirname"
 if set -q _flag_help
     echo "Run a Docker container with Codex installed and mount the current working directory."
     echo ""
-    echo "-f --full_dir: Use the full current working directory path also in the Docker image."
-    echo "-i PATH --inner_dir=PATH: Directory inside the Docker container where the current working directory should be mounted. Overrides --full_dir."
     echo "-v HOST:CONTAINER --volume=HOST:CONTAINER: Extra volume mount, passed directly to Docker. Can be specified multiple times."
-    echo "-s NAME_SUFFIX --suffix=NAME_SUFFIX: Suffix to add to the Docker container name."
+    echo "-i IMAGE_NAME_SUFFIX --isuffix=IMAGE_NAME_SUFFIX: Suffix to add after 'codex_' to build the image name."
+    echo "-c CONTAINER_NAME_SUFFIX --csuffix=CONTAINER_NAME_SUFFIX: Suffix to add to the Docker container name."
     exit 1
 end
 
-if set -q _flag_full_dir
-    set inner_dir (pwd)
-end
-if set -q _flag_inner_dir
-    set inner_dir $_flag_inner_dir
-end
 
 set extra_volumes
 if set -q _flag_volume
@@ -33,8 +26,11 @@ if set -q _flag_volume
         set -a extra_volumes -v $v
     end
 end
-if set -q _flag_suffix
-    set container_name "$container_name.$_flag_suffix"
+if set -q _flag_isuffix
+    set image_name "$image_name"_"$_flag_isuffix"
+end
+if set -q _flag_csuffix
+    set container_name "$container_name.$_flag_csuffix"
 end
 
 
