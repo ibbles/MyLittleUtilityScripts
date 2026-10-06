@@ -6,5 +6,12 @@ if ! command -v "${terminal}" >/dev/null ; then
     exit 1
 fi
 
-"${terminal}" -e nvim "$@" & disown
+if [[ $# -eq 0 ]] ; then
+    # No path given use the current working directory.
+    # This is a hack, and there may be non-path arguments,
+    # which we don't handle with this implementation.
+    set -- `pwd`
+fi
+
+"${terminal}" -e nvim $root "$@" & disown
 
