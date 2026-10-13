@@ -27,19 +27,25 @@ done <<< "$sessions"
 #    exit 0
 #fi
 
+
+##
+# The confirmation requirement has been disabled for now, since we believe that
+# we can trust this script.
+##
+
 # Print the sessions about to be deleted, so the user can decide to abort if
 # something unexpected shows up.
-echo "Exited generic sessions:"
-for session in "${to_delete[@]}" ; do
-    echo "  ${session}."
-done
+# echo "Exited generic sessions:"
+# for session in "${to_delete[@]}" ; do
+#     echo "  ${session}."
+# done
 
 # Ask the user if we should go ahead with the deletion.
-read -p "Delete these sessions? [y/n] " answer
-if [[ "$answer" != "y" ]] ; then
-    echo "Doing nothing."
-    exit 0
-fi
+# read -p "Delete these sessions? [y/n] " answer
+# if [[ "$answer" != "y" ]] ; then
+#     echo "Doing nothing."
+#     exit 0
+# fi
 
 # Do the actual deletion.
 echo "Deleting sessions."

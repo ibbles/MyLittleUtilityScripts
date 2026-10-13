@@ -59,6 +59,9 @@ function is_attached --argument-names session_name
     string match -rq '^[0-9]+[[:space:]]+' $list_clients_output
 end
 
+
+mn.zellij_purge_exited_generic.bash
+
 # List of sessions to be displayed to the user. Each entry consists of two pars:
 # a tag that is the exact name of the sessions and a description that is the
 # name of the session plus a marker indicating is the session is exitex, attached
