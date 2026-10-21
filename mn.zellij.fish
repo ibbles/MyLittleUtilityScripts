@@ -59,6 +59,7 @@ function is_attached --argument-names session_name
     string match -rq '^[0-9]+[[:space:]]+' $list_clients_output
 end
 
+echo "Loading Zellij sessions."
 
 mn.zellij_purge_exited_generic.bash
 

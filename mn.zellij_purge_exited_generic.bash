@@ -48,7 +48,6 @@ done <<< "$sessions"
 # fi
 
 # Do the actual deletion.
-echo "Deleting sessions."
 for session in "${to_delete[@]}" ; do
     zellij delete-session "${session}"
 done
