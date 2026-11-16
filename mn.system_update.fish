@@ -27,3 +27,8 @@ if command -q --search flatpak
     echo -e "\n\nFlatpaks:"
     flatpak update
 end
+
+if command -q cargo; and cargo install --list | string match -rq '^cargo-update v'
+    echo -e "\n\nRust packages:"
+    cargo install-update --all
+end
